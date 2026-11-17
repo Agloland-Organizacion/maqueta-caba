@@ -50,7 +50,7 @@ body { background: var(--cielo); color: var(--tinta); font-family: var(--sans); 
 /* buscador */
 .buscador {
   position: fixed; top: calc(12px + env(safe-area-inset-top, 0px)); left: max(16px, env(safe-area-inset-left, 0px));
-  width: min(360px, calc(100vw - 32px - 92px)); display: grid; gap: 4px; padding: 6px;
+  width: min(360px, calc(100vw - 32px - 140px)); display: grid; gap: 4px; padding: 6px;
 }
 .buscador form { display: flex; gap: 4px; align-items: center; }
 .buscador input {
@@ -96,7 +96,26 @@ button:focus-visible, input:focus-visible { outline: 2px solid var(--acento); ou
 .estado:empty { display: none; }
 .creditos { position: fixed; right: max(16px, env(safe-area-inset-right, 0px)); bottom: calc(10px + env(safe-area-inset-bottom, 0px)); font-size: 10.5px; color: var(--tenue); }
 [data-limpio="si"] .creditos { display: none; }
-@media (prefers-reduced-motion: reduce) { .interruptor input, .interruptor input::after { transition: none; } }
+/* intro: escaneo holográfico (un solo look a propósito, igual en claro y oscuro) */
+.escaneo {
+  position: fixed; top: calc(28px + env(safe-area-inset-top, 0px)); left: 50%; transform: translateX(-50%);
+  display: grid; justify-items: center; gap: 6px; font-family: var(--mono); color: #7ef0ff; text-align: center;
+  text-shadow: 0 0 8px rgba(54, 230, 255, .8), 0 0 22px rgba(54, 230, 255, .35); pointer-events: none; max-width: calc(100vw - 32px);
+}
+.escaneo .titulo { font-size: 12px; letter-spacing: .32em; text-transform: uppercase; }
+.escaneo .cuenta { font-size: 22px; font-variant-numeric: tabular-nums; letter-spacing: .06em; }
+.escaneo .sub2 { font-size: 11px; letter-spacing: .18em; opacity: .75; }
+.escaneo button { pointer-events: auto; margin-top: 6px; color: #7ef0ff; border-color: rgba(126, 240, 255, .45); background: rgba(4, 18, 28, .4); font-family: var(--mono); letter-spacing: .12em; text-transform: uppercase; font-size: 10.5px; }
+.lineas-scan {
+  position: fixed; inset: 0; pointer-events: none;
+  background: repeating-linear-gradient(to bottom, rgba(126, 240, 255, .05) 0 1px, transparent 1px 3px);
+  mix-blend-mode: screen;
+}
+.destello { position: fixed; inset: 0; pointer-events: none; background: var(--cielo); opacity: 0; transition: opacity .45s ease; }
+.destello.on { opacity: .85; transition: opacity .18s ease; }
+body.intro .buscador, body.intro .iconos, body.intro .creditos { opacity: 0; pointer-events: none; }
+.buscador, .iconos, .creditos { transition: opacity .6s ease; }
+@media (prefers-reduced-motion: reduce) { .interruptor input, .interruptor input::after, .buscador, .iconos, .creditos, .destello { transition: none; } }
 @media (max-width: 520px) { .creditos { display: none; } }
 </style>
 
@@ -113,6 +132,9 @@ button:focus-visible, input:focus-visible { outline: 2px solid var(--acento); ou
 </div>
 
 <div class="iconos">
+  <button class="ic vidrio" id="b-local-ic" type="button" title="Ir al local (L)" aria-label="Ir al local" hidden>
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 11l8-6 8 6"/><path d="M6 10v9h12v-9"/><path d="M10 19v-5h4v5"/></svg>
+  </button>
   <button class="ic vidrio" id="b-ajustes" type="button" aria-expanded="false" aria-controls="p-ajustes" title="Ajustes">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><path d="M4 7h10M18 7h2M4 17h4M12 17h8"/><circle cx="16" cy="7" r="2"/><circle cx="10" cy="17" r="2"/></svg>
   </button>
@@ -172,6 +194,14 @@ button:focus-visible, input:focus-visible { outline: 2px solid var(--acento); ou
   <p class="nota">Datos: BA Data (GCBA), CC-BY 2.5 AR · Tejido Urbano, callejero, manzanas, espacios verdes, ferrocarril y barrios.</p>
 </section>
 
+<div class="lineas-scan" id="lineas-scan" hidden></div>
+<div class="escaneo" id="escaneo" hidden aria-live="polite">
+  <div class="titulo">Escaneo digital · Ciudad de Buenos Aires</div>
+  <div class="cuenta"><span id="esc-barrios">00</span> / 48 barrios</div>
+  <div class="sub2"><span id="esc-vol">0</span> volúmenes · EPSG:9498</div>
+  <button type="button" id="b-saltar">Saltar</button>
+</div>
+<div class="destello" id="destello"></div>
 <div class="estado" id="estado" aria-live="polite">Cargando la Ciudad…</div>
 <div class="creditos">Datos: BA Data (GCBA), CC-BY 2.5 AR</div>
 
@@ -192,6 +222,8 @@ const css = (n) => getComputedStyle(raiz).getPropertyValue(n).trim();
 const estado = $('estado');
 const MAX_CARGADOS = 8;
 const LOCAL = { x: 2326.17, y: 4805.00 };  // vértice norte de la ochava del local, en metros de CABA (EPSG:9498 − 100000)
+// la interfaz arranca escondida si va a haber intro, así no aparece un instante antes del escaneo
+if (location.hash !== '#local' && !matchMedia('(prefers-reduced-motion: reduce)').matches) document.body.classList.add('intro');
 
 // ---------- ajustes (se recuerdan en este navegador) ----------
 const AJ_DEF = { paleta: 'auto', edificios: 'lisos', barrios: true, calles: true, bordes: false, verdes: true, creditos: false };
@@ -213,7 +245,6 @@ const sol = new THREE.DirectionalLight(0xfff4e6, 1.5); sol.position.set(700, 900
 const MAT = {};
 for (const k of ['calle', 'manzana', 'edificio', 'verde', 'via'])
   MAT[k] = new THREE.MeshLambertMaterial({ color: 0xffffff, side: THREE.DoubleSide, polygonOffset: k === 'manzana' || k === 'verde', polygonOffsetFactor: k === 'verde' ? -2 : -1 });
-const MAT_BORDE = new THREE.LineBasicMaterial({ color: 0x888888, transparent: true, opacity: 0.55 });
 const edificiosMallas = new Set();
 function colorearEdificios(m) {  // "por altura": del tono base al tono alto, de 0 a 60 m
   const g = m.geometry; const alt = g.getAttribute('altura'); if (!alt) return;
@@ -227,12 +258,12 @@ function aplicarAspecto() {
   if (AJ.paleta === 'auto') raiz.removeAttribute('data-paleta'); else raiz.setAttribute('data-paleta', AJ.paleta);
   raiz.setAttribute('data-limpio', AJ.creditos ? 'no' : 'si');
   scene.background = new THREE.Color(css('--cielo')); scene.fog = new THREE.Fog(css('--cielo'), 12000, 60000);
-  for (const k in MAT) MAT[k].color.set(css('--' + k)); MAT_BORDE.color.set(css('--borde'));
+  for (const k in MAT) MAT[k].color.set(css('--' + k));
   const porAltura = AJ.edificios === 'altura';
   MAT.edificio.vertexColors = porAltura; MAT.edificio.color.set(porAltura ? '#ffffff' : css('--edificio')); MAT.edificio.needsUpdate = true;
   if (porAltura) for (const m of edificiosMallas) colorearEdificios(m);
   MAT.verde.visible = AJ.verdes;
-  if (bordes) bordes.visible = AJ.bordes;
+  pintarBarrios();
   document.querySelectorAll('[data-ajuste]').forEach((g) => g.querySelectorAll('button').forEach((b) => b.setAttribute('aria-pressed', String(AJ[g.dataset.ajuste] === b.dataset.valor))));
   $('o-barrios').checked = AJ.barrios; $('o-calles').checked = AJ.calles; $('o-bordes').checked = AJ.bordes;
   $('o-verdes').checked = AJ.verdes; $('o-creditos').checked = AJ.creditos;
@@ -293,7 +324,7 @@ class Juntador {
 }
 
 // ---------- barrios: contornos siempre, volúmenes a demanda ----------
-let BARRIOS = []; const cargados = new Map(); let ocupado = false; let centro = new THREE.Vector3(), radio = 12000; let bordes = null;
+let BARRIOS = []; const cargados = new Map(); let ocupado = false; let centro = new THREE.Vector3(), radio = 12000;
 async function leerTexto64(ruta) {
   const r = await fetch(ruta); if (!r.ok) throw new Error(ruta + ': ' + r.status);
   const bin = atob((await r.text()).trim()); const u8 = new Uint8Array(bin.length);
@@ -381,7 +412,8 @@ let local = null;
     const u8 = await leerTexto64('local.b64.txt');
     const gltf = await new GLTFLoader().parseAsync(u8.buffer, '');
     local = gltf.scene; local.position.set(LOCAL.x, 0, -LOCAL.y); scene.add(local);
-    $('b-local').hidden = false;
+    $('b-local').hidden = false; $('b-local-ic').hidden = false;
+    if (location.hash === '#local') irAlLocal();  // link directo: …/#local
   } catch { /* sin modelo del local: la maqueta sigue igual */ }
 })();
 
@@ -431,7 +463,7 @@ function actualizarCarteles() {
     const ds = s.position.distanceTo(t); if (ds < r) cerca.push([ds, s]);
   }
   cerca.sort((a, b) => a[0] - b[0]); for (const [, s] of cerca.slice(0, 24)) s.visible = true;
-  for (const s of nombresBarrios) s.visible = AJ.barrios && d > 2200;
+  for (const s of nombresBarrios) s.visible = (AJ.barrios || s === BARRIOS[hover]?.cartel) && d > 2200;
 }
 
 // ---------- buscador ----------
@@ -504,7 +536,105 @@ function vista(tipo) {
 $('b-general').onclick = () => vista('general');
 $('b-arriba').onclick = () => vista('arriba');
 // de frente a la ochava (mira al este), desde la esquina, a la altura de una persona parada enfrente
-$('b-local').onclick = () => { pin.visible = false; volarA(LOCAL.x - 3, -(LOCAL.y - 4), new THREE.Vector3(26, 6, 4), 3); };
+function irAlLocal() { if (!local) return; pin.visible = false; volarA(LOCAL.x - 3, -(LOCAL.y - 4), new THREE.Vector3(26, 6, 4), 3); }
+$('b-local').onclick = irAlLocal; $('b-local-ic').onclick = irAlLocal;
+addEventListener('keydown', (e) => {  // tecla L, salvo mientras se escribe en el buscador
+  if ((e.key === 'l' || e.key === 'L') && !e.ctrlKey && !e.metaKey && !e.altKey && !/^(INPUT|TEXTAREA)$/.test(document.activeElement?.tagName)) irAlLocal();
+});
+addEventListener('hashchange', () => { if (location.hash === '#local') irAlLocal(); });
+
+// ---------- barrios: brillo al pasar y zoom al elegir ----------
+let LIMITES = null, hover = -1, colores = null;
+function pintarBarrios() {
+  if (!BARRIOS.length || !BARRIOS[0].relleno || intro.activo) return;
+  colores = { base: new THREE.Color(css('--calle')), acento: new THREE.Color(css('--acento')), borde: new THREE.Color(css('--borde')) };
+  BARRIOS.forEach((b, i) => {
+    const on = i === hover;
+    b.matSuelo.color.copy(colores.base);
+    b.borde.material.color.copy(on ? colores.acento : colores.borde); b.borde.material.opacity = on ? 1 : 0.55;
+    b.borde.visible = AJ.bordes || on;
+    b.cartel.scale.copy(b.cartel.userData.escala).multiplyScalar(on ? 1.25 : 1);
+  });
+}
+function brillo(ahora) {  // el barrio bajo el mouse late suave hacia el color de acento
+  const b = BARRIOS[hover]; b.matSuelo.color.copy(colores.base).lerp(colores.acento, 0.45 + 0.2 * Math.sin(ahora / 240));
+}
+const ray = new THREE.Raycaster(); const puntero = new THREE.Vector2(); let buscarHover = false, abajo = null;
+const ponerPuntero = (e) => puntero.set(e.clientX / innerWidth * 2 - 1, -(e.clientY / innerHeight) * 2 + 1);
+function barrioBajo() {
+  if (!BARRIOS.length || camera.position.distanceTo(controls.target) < 1500) return -1;  // de cerca ya se ven los edificios
+  ray.setFromCamera(puntero, camera);
+  const h = ray.intersectObjects(BARRIOS.map((b) => b.relleno), false)[0];
+  return h ? h.object.userData.barrio : -1;
+}
+function fijarHover(i) { if (i === hover) return; hover = i; canvas.style.cursor = i >= 0 ? 'pointer' : ''; pintarBarrios(); }
+function irABarrio(i) {
+  const b = BARRIOS[i]; const ext = Math.max(b.bbox[2] - b.bbox[0], b.bbox[3] - b.bbox[1]);
+  fijarHover(-1); pin.visible = false;
+  volarA((b.bbox[0] + b.bbox[2]) / 2, -(b.bbox[1] + b.bbox[3]) / 2, new THREE.Vector3(-0.15 * ext, 0.75 * ext, 0.8 * ext));
+}
+canvas.addEventListener('pointermove', (e) => { ponerPuntero(e); buscarHover = e.pointerType === 'mouse'; });
+canvas.addEventListener('pointerleave', () => fijarHover(-1));
+canvas.addEventListener('pointerdown', (e) => { if (intro.activo) { terminarIntro(); return; } abajo = [e.clientX, e.clientY]; });
+canvas.addEventListener('pointerup', (e) => {  // un clic (o toque) sin arrastrar elige el barrio
+  if (!abajo) return; const mov = Math.hypot(e.clientX - abajo[0], e.clientY - abajo[1]); abajo = null;
+  if (mov > 6) return; ponerPuntero(e); const i = barrioBajo(); if (i >= 0) irABarrio(i);
+});
+
+// ---------- intro: escaneo holográfico de la Ciudad ----------
+const intro = { activo: false };
+function iniciarIntro() {
+  if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  Object.assign(intro, { activo: true, t0: performance.now(), dur: 4200, cierre: 0 });
+  document.body.classList.add('intro'); $('escaneo').hidden = false; $('lineas-scan').hidden = false;
+  scene.background = new THREE.Color(0x04121c); scene.fog = null;
+  for (const b of BARRIOS) {
+    b.relleno.material = b.matHolo; b.matHolo.opacity = 0; b.cartel.visible = false;
+    Object.assign(b.borde.material, { opacity: 0, blending: THREE.AdditiveBlending }); b.borde.material.color.set(0x36e6ff); b.borde.visible = true;
+  }
+  const alto = 900, largoZ = (LIMITES.y1 - LIMITES.y0) + 3000;
+  intro.pared = new THREE.Mesh(new THREE.PlaneGeometry(largoZ, alto), new THREE.ShaderMaterial({
+    transparent: true, blending: THREE.AdditiveBlending, depthWrite: false, side: THREE.DoubleSide,
+    vertexShader: 'varying vec2 vUv; void main(){ vUv = uv; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }',
+    fragmentShader: 'varying vec2 vUv; void main(){ float a = pow(1.0 - vUv.y, 2.2) * 0.7; float b = smoothstep(0.0, 0.1, vUv.x) * smoothstep(1.0, 0.9, vUv.x); gl_FragColor = vec4(0.21, 0.9, 1.0, a * b); }',
+  }));
+  intro.pared.rotation.y = Math.PI / 2; intro.pared.position.set(LIMITES.x0, alto / 2, centro.z);
+  intro.grilla = new THREE.GridHelper(radio * 3, 96, 0x36e6ff, 0x16606f);
+  Object.assign(intro.grilla.material, { transparent: true, opacity: 0.18, depthWrite: false }); intro.grilla.position.set(centro.x, -0.5, centro.z);
+  scene.add(intro.pared, intro.grilla);
+  intro.hacia = camera.position.clone();  // termina en la vista general
+  intro.desde = centro.clone().add(new THREE.Vector3(-radio * 0.05, radio * 1.7, radio * 0.6));
+  camera.position.copy(intro.desde); controls.target.copy(centro);
+}
+function actualizarIntro(ahora) {
+  const t = Math.min(1, (ahora - intro.t0) / intro.dur); const e = t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;
+  const sx = LIMITES.x0 - 600 + (LIMITES.x1 - LIMITES.x0 + 1200) * e;
+  intro.pared.position.x = sx;
+  let n = 0, vol = 0;
+  for (const b of BARRIOS) {
+    const r = Math.min(1, Math.max(0, (sx - b.bbox[0]) / Math.max(250, b.bbox[2] - b.bbox[0])));
+    if (r > 0.5) { n++; vol += b.edificios; }
+    const titila = r > 0 && r < 1 ? 0.55 + 0.45 * Math.random() : 1;  // el barrio parpadea mientras la pared lo cruza
+    b.matHolo.opacity = (0.16 * r + (r > 0 && r < 1 ? 0.22 : 0)) * titila;
+    b.borde.material.opacity = 0.95 * r;
+    b.cartel.visible = AJ.barrios && r > 0.6;
+  }
+  $('esc-barrios').textContent = String(n).padStart(2, '0'); $('esc-vol').textContent = vol.toLocaleString('es-AR');
+  camera.position.lerpVectors(intro.desde, intro.hacia, e); controls.target.copy(centro);
+  if (t >= 1 && !intro.cierre) intro.cierre = ahora;
+  if (intro.cierre && ahora - intro.cierre > 700) terminarIntro();
+}
+function terminarIntro() {
+  if (!intro.activo) return; intro.activo = false;
+  $('destello').classList.add('on'); setTimeout(() => $('destello').classList.remove('on'), 180);
+  for (const o of [intro.pared, intro.grilla]) { scene.remove(o); o.geometry.dispose(); o.material.dispose(); }
+  for (const b of BARRIOS) { b.relleno.material = b.matSuelo; b.borde.material.blending = THREE.NormalBlending; }
+  document.body.classList.remove('intro'); $('escaneo').hidden = true; $('lineas-scan').hidden = true;
+  camera.position.copy(intro.hacia); controls.target.copy(centro); controls.update();
+  aplicarAspecto();
+}
+$('b-saltar').onclick = terminarIntro;
+addEventListener('keydown', () => { if (intro.activo) terminarIntro(); });
 
 // ---------- arranque ----------
 aplicarAspecto();
@@ -520,22 +650,31 @@ aplicarAspecto();
       CALLES.porCalle.get(t[0]).push(t); CALLES.largoCalle[t[0]] += largo(t[3]);
     }
     $('l-calles').innerHTML = [...CALLES.nombres].sort((a, b) => a.localeCompare(b, 'es')).map((n) => `<option value="${lindo(n)}">`).join('');
-    const suelo = new Juntador(); const lineas = [];
-    for (const b of BARRIOS) for (const anillo of b.contorno) {
-      const a = new Float32Array(anillo.length * 2); anillo.forEach(([x, y], i) => { a[2 * i] = x; a[2 * i + 1] = -y; });
-      suelo.techo([a], 0);
-      for (let i = 0; i < anillo.length; i++) { const p = anillo[i], q = anillo[(i + 1) % anillo.length]; lineas.push(p[0], 0.6, -p[1], q[0], 0.6, -q[1]); }
-      if (anillo === b.contorno[0]) {
-        const s = cartel(b.nombre, true); s.position.set((b.bbox[0] + b.bbox[2]) / 2, 30, -(b.bbox[1] + b.bbox[3]) / 2); nombresBarrios.push(s); scene.add(s);
+    // cada barrio con su propio suelo y su borde, para poder iluminarlo y elegirlo
+    let x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity;
+    BARRIOS.forEach((b, i) => {
+      const suelo = new Juntador(); const lineas = [];
+      for (const anillo of b.contorno) {
+        const a = new Float32Array(anillo.length * 2); anillo.forEach(([x, y], k) => { a[2 * k] = x; a[2 * k + 1] = -y; });
+        suelo.techo([a], 0);
+        for (let k = 0; k < anillo.length; k++) { const p = anillo[k], q = anillo[(k + 1) % anillo.length]; lineas.push(p[0], 0.6, -p[1], q[0], 0.6, -q[1]); }
       }
-    }
-    const mSuelo = suelo.malla(MAT.calle); scene.add(mSuelo);
-    const gb = new THREE.BufferGeometry(); gb.setAttribute('position', new THREE.Float32BufferAttribute(lineas, 3));
-    bordes = new THREE.LineSegments(gb, MAT_BORDE); scene.add(bordes);
-    mSuelo.geometry.computeBoundingSphere(); centro.copy(mSuelo.geometry.boundingSphere.center); centro.y = 0; radio = mSuelo.geometry.boundingSphere.radius;
+      b.matSuelo = new THREE.MeshLambertMaterial({ color: css('--calle'), side: THREE.DoubleSide });
+      b.matHolo = new THREE.MeshBasicMaterial({ color: 0x36e6ff, transparent: true, opacity: 0, blending: THREE.AdditiveBlending, depthWrite: false, side: THREE.DoubleSide });
+      b.relleno = suelo.malla(b.matSuelo); b.relleno.userData.barrio = i; scene.add(b.relleno);
+      const gb = new THREE.BufferGeometry(); gb.setAttribute('position', new THREE.Float32BufferAttribute(lineas, 3));
+      b.borde = new THREE.LineSegments(gb, new THREE.LineBasicMaterial({ color: css('--borde'), transparent: true, opacity: 0.55 })); scene.add(b.borde);
+      b.cartel = cartel(b.nombre, true); b.cartel.position.set((b.bbox[0] + b.bbox[2]) / 2, 30, -(b.bbox[1] + b.bbox[3]) / 2);
+      b.cartel.userData.escala = b.cartel.scale.clone(); nombresBarrios.push(b.cartel); scene.add(b.cartel);
+      x0 = Math.min(x0, b.bbox[0]); y0 = Math.min(y0, b.bbox[1]); x1 = Math.max(x1, b.bbox[2]); y1 = Math.max(y1, b.bbox[3]);
+    });
+    centro.set((x0 + x1) / 2, 0, -(y0 + y1) / 2); radio = Math.hypot(x1 - x0, y1 - y0) / 2;
+    LIMITES = { x0, x1, y0, y1 };
     aplicarAspecto(); vista('general');
     estado.textContent = '';
-  } catch (e) { estado.textContent = 'No se pudo armar la maqueta: ' + e.message + '. Probá recargar la página.'; }
+    if (location.hash === '#local') irAlLocal();  // si el local llegó antes que la Ciudad, la vista general lo pisó
+    else iniciarIntro();
+  } catch (e) { document.body.classList.remove('intro'); estado.textContent = 'No se pudo armar la maqueta: ' + e.message + '. Probá recargar la página.'; }
 })();
 
 renderer.setAnimationLoop(() => {
@@ -544,7 +683,14 @@ renderer.setAnimationLoop(() => {
     camera.position.lerpVectors(vuelo.desdeC, vuelo.haciaC, e); controls.target.lerpVectors(vuelo.desdeT, vuelo.haciaT, e);
     if (vuelo.t >= 1) vuelo = null;
   }
-  controls.update(); actualizarCarteles(); renderer.render(scene, camera);
+  const ahora = performance.now();
+  if (intro.activo) actualizarIntro(ahora);
+  else {
+    if (buscarHover) { buscarHover = false; fijarHover(barrioBajo()); }
+    if (hover >= 0) brillo(ahora);
+    actualizarCarteles();
+  }
+  controls.update(); renderer.render(scene, camera);
 });
 </script>
 
