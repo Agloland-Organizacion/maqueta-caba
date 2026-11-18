@@ -11,33 +11,33 @@
 /* Layout: la Ciudad a pantalla completa; arriba a la izquierda solo el buscador, arriba a la derecha dos botones
    (ajustes e información) que abren paneles laterales. Nada más en pantalla hasta que se pide. */
 :root {
-  --cielo: #eceef0; --calle: #a4a6aa; --manzana: #d3d0c9; --edificio: #f4f2ee; --edificio-alto: #b9b3a8;
+  --cielo: #eceef0; --calle: #b6b6b3; --calzada: #8c8e93; --arbol: #7f9a6c; --tronco: #6b5a48; --agua: #8fb6c9; --semaforo: #2a2c30; --manzana: #d3d0c9; --edificio: #f4f2ee; --edificio-alto: #b9b3a8;
   --verde: #9cb68b; --via: #8a7766; --borde: #8d9096;
   --panel: rgba(251, 250, 248, .9); --tinta: #22252a; --tenue: #6a6e75; --linea: rgba(34, 37, 42, .12); --acento: #b5562c;
   --sans: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
   --mono: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
 }
 @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
-  --cielo: #191b1f; --calle: #34373d; --manzana: #45484e; --edificio: #c9c6bf; --edificio-alto: #7f7a72;
+  --cielo: #191b1f; --calle: #34373d; --calzada: #26282c; --arbol: #3f5a39; --tronco: #4a3f34; --agua: #2e4d5c; --semaforo: #0f1012; --manzana: #45484e; --edificio: #c9c6bf; --edificio-alto: #7f7a72;
   --verde: #4a6342; --via: #5e4d40; --borde: #5d6168;
   --panel: rgba(28, 30, 34, .88); --tinta: #ecebe7; --tenue: #a3a7ae; --linea: rgba(236, 235, 231, .14); --acento: #e08a5b;
   color-scheme: dark } }
 :root[data-theme="dark"] {
-  --cielo: #191b1f; --calle: #34373d; --manzana: #45484e; --edificio: #c9c6bf; --edificio-alto: #7f7a72;
+  --cielo: #191b1f; --calle: #34373d; --calzada: #26282c; --arbol: #3f5a39; --tronco: #4a3f34; --agua: #2e4d5c; --semaforo: #0f1012; --manzana: #45484e; --edificio: #c9c6bf; --edificio-alto: #7f7a72;
   --verde: #4a6342; --via: #5e4d40; --borde: #5d6168;
   --panel: rgba(28, 30, 34, .88); --tinta: #ecebe7; --tenue: #a3a7ae; --linea: rgba(236, 235, 231, .14); --acento: #e08a5b;
   color-scheme: dark }
 /* paletas elegidas en Ajustes: mandan sobre el tema del sistema */
 html:root[data-paleta="clara"] {
-  --cielo: #eceef0; --calle: #a4a6aa; --manzana: #d3d0c9; --edificio: #f4f2ee; --edificio-alto: #b9b3a8;
+  --cielo: #eceef0; --calle: #b6b6b3; --calzada: #8c8e93; --arbol: #7f9a6c; --tronco: #6b5a48; --agua: #8fb6c9; --semaforo: #2a2c30; --manzana: #d3d0c9; --edificio: #f4f2ee; --edificio-alto: #b9b3a8;
   --verde: #9cb68b; --via: #8a7766; --borde: #8d9096;
   --panel: rgba(251, 250, 248, .9); --tinta: #22252a; --tenue: #6a6e75; --linea: rgba(34, 37, 42, .12); --acento: #b5562c; color-scheme: light }
 html:root[data-paleta="oscura"] {
-  --cielo: #191b1f; --calle: #34373d; --manzana: #45484e; --edificio: #c9c6bf; --edificio-alto: #7f7a72;
+  --cielo: #191b1f; --calle: #34373d; --calzada: #26282c; --arbol: #3f5a39; --tronco: #4a3f34; --agua: #2e4d5c; --semaforo: #0f1012; --manzana: #45484e; --edificio: #c9c6bf; --edificio-alto: #7f7a72;
   --verde: #4a6342; --via: #5e4d40; --borde: #5d6168;
   --panel: rgba(28, 30, 34, .88); --tinta: #ecebe7; --tenue: #a3a7ae; --linea: rgba(236, 235, 231, .14); --acento: #e08a5b; color-scheme: dark }
 html:root[data-paleta="papel"] {
-  --cielo: #f3efe6; --calle: #e2dccf; --manzana: #ebe6db; --edificio: #fbf9f4; --edificio-alto: #d9cfbd;
+  --cielo: #f3efe6; --calle: #e2dccf; --calzada: #d2c9b8; --arbol: #b9c4a3; --tronco: #a8987f; --agua: #c3d4d6; --semaforo: #6f6758; --manzana: #ebe6db; --edificio: #fbf9f4; --edificio-alto: #d9cfbd;
   --verde: #d6dcc4; --via: #c9bca9; --borde: #c4bbab;
   --panel: rgba(250, 247, 240, .92); --tinta: #3b352c; --tenue: #857c6e; --linea: rgba(59, 53, 44, .12); --acento: #a0613a; color-scheme: light }
 
@@ -115,6 +115,15 @@ button:focus-visible, input:focus-visible { outline: 2px solid var(--acento); ou
 .destello.on { opacity: .85; transition: opacity .18s ease; }
 body.intro .buscador, body.intro .iconos, body.intro .creditos { opacity: 0; pointer-events: none; }
 .buscador, .iconos, .creditos { transition: opacity .6s ease; }
+/* lugares: un renglón por categoría con su ícono, cuántos hay y el interruptor */
+.panel select { font: 13px var(--sans); color: var(--tinta); background: transparent; border: 1px solid var(--linea); border-radius: 6px; padding: 6px 8px; width: 100%; }
+.panel select option { background: var(--cielo); }
+.lug span { display: flex; align-items: center; gap: 8px; min-width: 0; }
+.lug i { flex: none; width: 18px; height: 18px; border-radius: 50%; display: grid; place-items: center; font: 600 10px var(--sans); font-style: normal; color: #fff; }
+.lug b { margin-left: auto; font: 12px var(--mono); font-weight: 400; font-variant-numeric: tabular-nums; color: var(--tenue); }
+.lug b.cero { opacity: .5; }
+.ficha { position: fixed; padding: 6px 9px; pointer-events: none; font-size: 12px; line-height: 1.4; max-width: 260px; z-index: 5; }
+.ficha small { display: block; color: var(--tenue); font-size: 11px; }
 @media (prefers-reduced-motion: reduce) { .interruptor input, .interruptor input::after, .buscador, .iconos, .creditos, .destello { transition: none; } }
 @media (max-width: 520px) { .creditos { display: none; } }
 </style>
@@ -134,6 +143,9 @@ body.intro .buscador, body.intro .iconos, body.intro .creditos { opacity: 0; poi
 <div class="iconos">
   <button class="ic vidrio" id="b-local-ic" type="button" title="Ir al local (L)" aria-label="Ir al local" hidden>
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 11l8-6 8 6"/><path d="M6 10v9h12v-9"/><path d="M10 19v-5h4v5"/></svg>
+  </button>
+  <button class="ic vidrio" id="b-lugares" type="button" aria-expanded="false" aria-controls="p-lugares" title="Lugares" hidden>
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-6-5.6-6-10.5a6 6 0 0 1 12 0C18 15.4 12 21 12 21z"/><circle cx="12" cy="10.5" r="2.2"/></svg>
   </button>
   <button class="ic vidrio" id="b-ajustes" type="button" aria-expanded="false" aria-controls="p-ajustes" title="Ajustes">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><path d="M4 7h10M18 7h2M4 17h4M12 17h8"/><circle cx="16" cy="7" r="2"/><circle cx="10" cy="17" r="2"/></svg>
@@ -166,6 +178,8 @@ body.intro .buscador, body.intro .iconos, body.intro .creditos { opacity: 0; poi
     <label class="interruptor">Nombres de calles <input type="checkbox" id="o-calles"></label>
     <label class="interruptor">Bordes de barrios <input type="checkbox" id="o-bordes"></label>
     <label class="interruptor">Espacios verdes <input type="checkbox" id="o-verdes"></label>
+    <label class="interruptor">Árboles <input type="checkbox" id="o-arboles"></label>
+    <label class="interruptor">Semáforos <input type="checkbox" id="o-semaforos"></label>
     <label class="interruptor">Créditos en pantalla <input type="checkbox" id="o-creditos"></label>
   </div>
   <div class="grupo">
@@ -176,6 +190,15 @@ body.intro .buscador, body.intro .iconos, body.intro .creditos { opacity: 0; poi
       <button type="button" id="b-local" hidden>El local</button>
     </div>
   </div>
+</section>
+
+<section class="panel vidrio" id="p-lugares" hidden aria-label="Lugares">
+  <div class="grupo">
+    <h2><label for="s-zona">Lugares en</label></h2>
+    <select id="s-zona"><option value="-1">Toda la Ciudad</option></select>
+  </div>
+  <div id="l-lugares" class="grupo"></div>
+  <p class="nota">Pasá el mouse por un punto para ver qué es; con un clic vas hasta ahí. Datos: BA Data (GCBA).</p>
 </section>
 
 <section class="panel vidrio" id="p-info" hidden aria-label="Información">
@@ -191,7 +214,7 @@ body.intro .buscador, body.intro .iconos, body.intro .creditos { opacity: 0; poi
   </div>
   <p class="nota">Los barrios se cargan solos alrededor de lo que mirás. Arrastrar: mover · clic derecho o dos dedos: girar · rueda o pellizco: acercar.</p>
   <p class="nota">Alturas de Tejido Urbano en escalones de 2,8 m (pisos), relevamiento hasta 2021.</p>
-  <p class="nota">Datos: BA Data (GCBA), CC-BY 2.5 AR · Tejido Urbano, callejero, manzanas, espacios verdes, ferrocarril y barrios.</p>
+  <p class="nota">Datos: BA Data (GCBA), CC-BY 2.5 AR · Tejido Urbano, callejero, manzanas, espacios verdes, ferrocarril, barrios, arbolado, semáforos y lugares (estaciones de servicio, comisarías, bomberos, salud, educación, cultura, deporte y servicios).</p>
 </section>
 
 <div class="lineas-scan" id="lineas-scan" hidden></div>
@@ -202,6 +225,7 @@ body.intro .buscador, body.intro .iconos, body.intro .creditos { opacity: 0; poi
   <button type="button" id="b-saltar">Saltar</button>
 </div>
 <div class="destello" id="destello"></div>
+<div class="ficha vidrio" id="ficha" hidden></div>
 <div class="estado" id="estado" aria-live="polite">Cargando la Ciudad…</div>
 <div class="creditos">Datos: BA Data (GCBA), CC-BY 2.5 AR</div>
 
@@ -226,7 +250,8 @@ const LOCAL = { x: 2326.17, y: 4805.00 };  // vértice norte de la ochava del lo
 if (location.hash !== '#local' && !matchMedia('(prefers-reduced-motion: reduce)').matches) document.body.classList.add('intro');
 
 // ---------- ajustes (se recuerdan en este navegador) ----------
-const AJ_DEF = { paleta: 'auto', edificios: 'lisos', barrios: true, calles: true, bordes: false, verdes: true, creditos: false };
+const AJ_DEF = { paleta: 'auto', edificios: 'lisos', barrios: true, calles: true, bordes: false, verdes: true, arboles: true, semaforos: true, creditos: false,
+  lugares: ['servicio', 'comisaria', 'bomberos', 'hospital'] };
 let AJ = { ...AJ_DEF };
 try { AJ = { ...AJ_DEF, ...JSON.parse(localStorage.getItem('maqueta-ajustes') || '{}') }; } catch {}
 const guardar = () => { try { localStorage.setItem('maqueta-ajustes', JSON.stringify(AJ)); } catch {} };
@@ -243,7 +268,7 @@ controls.minDistance = 20; controls.maxDistance = 40000;
 scene.add(new THREE.HemisphereLight(0xffffff, 0x8a8478, 1.2));
 const sol = new THREE.DirectionalLight(0xfff4e6, 1.5); sol.position.set(700, 900, -700); scene.add(sol);
 const MAT = {};
-for (const k of ['calle', 'manzana', 'edificio', 'verde', 'via'])
+for (const k of ['calle', 'calzada', 'manzana', 'edificio', 'verde', 'via', 'arbol', 'tronco', 'agua', 'semaforo'])
   MAT[k] = new THREE.MeshLambertMaterial({ color: 0xffffff, side: THREE.DoubleSide, polygonOffset: k === 'manzana' || k === 'verde', polygonOffsetFactor: k === 'verde' ? -2 : -1 });
 const edificiosMallas = new Set();
 function colorearEdificios(m) {  // "por altura": del tono base al tono alto, de 0 a 60 m
@@ -267,6 +292,8 @@ function aplicarAspecto() {
   document.querySelectorAll('[data-ajuste]').forEach((g) => g.querySelectorAll('button').forEach((b) => b.setAttribute('aria-pressed', String(AJ[g.dataset.ajuste] === b.dataset.valor))));
   $('o-barrios').checked = AJ.barrios; $('o-calles').checked = AJ.calles; $('o-bordes').checked = AJ.bordes;
   $('o-verdes').checked = AJ.verdes; $('o-creditos').checked = AJ.creditos;
+  $('o-arboles').checked = AJ.arboles; $('o-semaforos').checked = AJ.semaforos;
+  MAT.arbol.visible = MAT.tronco.visible = AJ.arboles; MAT.semaforo.visible = AJ.semaforos;
 }
 matchMedia('(prefers-color-scheme: dark)').addEventListener('change', aplicarAspecto);
 new MutationObserver(aplicarAspecto).observe(raiz, { attributes: true, attributeFilter: ['data-theme'] });
@@ -276,17 +303,17 @@ addEventListener('resize', tamano); tamano();
 // paneles y controles de ajustes
 function alternar(boton, panel) {
   const abrir = panel.hidden;
-  for (const [b, p] of [[$('b-ajustes'), $('p-ajustes')], [$('b-info'), $('p-info')]]) { p.hidden = true; b.setAttribute('aria-expanded', 'false'); }
+  for (const id of PANELES) { $('p-' + id).hidden = true; $('b-' + id).setAttribute('aria-expanded', 'false'); }
   panel.hidden = !abrir; boton.setAttribute('aria-expanded', String(abrir));
 }
-$('b-ajustes').onclick = () => alternar($('b-ajustes'), $('p-ajustes'));
-$('b-info').onclick = () => alternar($('b-info'), $('p-info'));
+const PANELES = ['lugares', 'ajustes', 'info'];
+for (const id of PANELES) $('b-' + id).onclick = () => alternar($('b-' + id), $('p-' + id));
 document.querySelectorAll('[data-ajuste]').forEach((g) => g.addEventListener('click', (e) => {
   const b = e.target.closest('button'); if (!b) return; AJ[g.dataset.ajuste] = b.dataset.valor; guardar(); aplicarAspecto();
 }));
-for (const k of ['barrios', 'calles', 'bordes', 'verdes', 'creditos'])
+for (const k of ['barrios', 'calles', 'bordes', 'verdes', 'arboles', 'semaforos', 'creditos'])
   $('o-' + k).addEventListener('change', (e) => { AJ[k] = e.target.checked; guardar(); aplicarAspecto(); });
-addEventListener('keydown', (e) => { if (e.key === 'Escape') for (const id of ['ajustes', 'info']) { $('p-' + id).hidden = true; $('b-' + id).setAttribute('aria-expanded', 'false'); } });
+addEventListener('keydown', (e) => { if (e.key === 'Escape') for (const id of PANELES) { $('p-' + id).hidden = true; $('b-' + id).setAttribute('aria-expanded', 'false'); } });
 
 // ---------- geometría ----------
 const areaPlan = (a) => { let s = 0; for (let i = 0, n = a.length / 2; i < n; i++) { const j = (i + n - 1) % n; s += a[2 * j] * -a[2 * i + 1] - a[2 * i] * -a[2 * j + 1]; } return s / 2; };
@@ -365,18 +392,85 @@ async function armarBarrio(b) {
       const nx = -(z1 - z0) / L * 4, nz = (x1 - x0) / L * 4; const k = vias.pos.length / 3;
       vias.pos.push(x0 - nx, 0.4, z0 - nz, x1 - nx, 0.4, z1 - nz, x1 + nx, 0.4, z1 + nz, x0 + nx, 0.4, z0 + nz);
       for (let m = 0; m < 4; m++) vias.nor.push(0, 1, 0);
-      vias.idx.push(k, k + 1, k + 2, k, k + 2, k + 3);
+      vias.idx.push(k, k + 2, k + 1, k, k + 3, k + 2);
     }
   });
   grupo.add(vias.malla(MAT.via));
   const edif = new Juntador(); recorrer(ed, ox, oy, (a, g) => { const h = ed.H[g] / 10; edif.techo(a, h, h); edif.paredes(a, h); });
   const mEd = edif.malla(MAT.edificio, true); grupo.add(mEd); edificiosMallas.add(mEd);
   if (AJ.edificios === 'altura') colorearEdificios(mEd);
+  grupo.add(...capasDe(BARRIOS.indexOf(b), await leerCapas(b.slug)));
   grupo.add(...cartelesDe(BARRIOS.indexOf(b)));
   return grupo;
 }
+
+// ---------- capas: calzadas, árboles, semáforos y lagos ----------
+async function leerCapas(slug) { try { const r = await fetch('datos/' + slug + '.capas.json'); return r.ok ? await r.json() : null; } catch { return null; } }
+const ANCHO = [9, 16, 5, 18];  // calzada según el tipo de cuadra: calle, avenida, pasaje, autopista (m, estimado)
+const MAT_PINTURA = new THREE.MeshBasicMaterial({ color: 0xeceae3 });
+const GEO = {  // piezas que se repiten miles de veces: van como instancias
+  copa: new THREE.IcosahedronGeometry(1, 1),
+  tronco: new THREE.CylinderGeometry(0.5, 0.7, 1, 6).translate(0, 0.5, 0),
+  poste: new THREE.CylinderGeometry(0.07, 0.07, 3.2, 6).translate(0, 1.6, 0),
+  cabezal: new THREE.BoxGeometry(0.34, 0.95, 0.34).translate(0, 3.6, 0),
+};
+function capasDe(bi, c) {
+  const out = [];
+  // calzadas sobre el eje de cada cuadra, un poco estiradas para tapar los cruces; línea punteada en avenidas
+  const cz = new Juntador(), marcas = new Juntador();
+  const tira = (J, x0, z0, x1, z1, w, y) => {
+    const L = Math.hypot(x1 - x0, z1 - z0) || 1, ux = (x1 - x0) / L, uz = (z1 - z0) / L, nx = -uz * w, nz = ux * w; const k = J.pos.length / 3;
+    J.pos.push(x0 - nx, y, z0 - nz, x1 - nx, y, z1 - nz, x1 + nx, y, z1 + nz, x0 + nx, y, z0 + nz);
+    for (let m = 0; m < 4; m++) J.nor.push(0, 1, 0);
+    J.idx.push(k, k + 2, k + 1, k, k + 3, k + 2);
+  };
+  for (const t of CALLES?.tramos || []) {
+    if (t[4] !== bi) continue;
+    const p = t[3], tipo = t[5] ?? 0, w = ANCHO[tipo] / 2;
+    for (let i = 0; i + 3 < p.length; i += 2) {
+      const x0 = p[i], z0 = p[i + 1], x1 = p[i + 2], z1 = p[i + 3]; const L = Math.hypot(x1 - x0, z1 - z0) || 1, ux = (x1 - x0) / L, uz = (z1 - z0) / L;
+      tira(cz, x0 - ux * w, z0 - uz * w, x1 + ux * w, z1 + uz * w, w, 0.05);
+      if (tipo === 1) for (let d = 2; d + 3 < L - 2; d += 7) tira(marcas, x0 + ux * d, z0 + uz * d, x0 + ux * (d + 3), z0 + uz * (d + 3), 0.08, 0.08);
+    }
+  }
+  if (cz.idx.length) out.push(cz.malla(MAT.calzada));
+  if (marcas.idx.length) out.push(marcas.malla(MAT_PINTURA));
+  if (!c) return out;
+  // lagos
+  if (c.agua?.length) {
+    const ag = new Juntador();
+    for (const poly of c.agua) ag.techo(poly.map((r) => { const a = new Float32Array(r.length); for (let i = 0; i < r.length; i += 2) { a[i] = r[i]; a[i + 1] = -r[i + 1]; } return a; }), 0.35);
+    out.push(ag.malla(MAT.agua));
+  }
+  // árboles: tronco y copa a escala de su altura censada (las palmeras, copa chica arriba)
+  const n = c.arboles.length / 4;
+  if (n) {
+    const copas = new THREE.InstancedMesh(GEO.copa, MAT.arbol, n), troncos = new THREE.InstancedMesh(GEO.tronco, MAT.tronco, n);
+    const m = new THREE.Matrix4(), q = new THREE.Quaternion(), pos = new THREE.Vector3(), esc = new THREE.Vector3();
+    for (let i = 0; i < n; i++) {
+      const x = c.arboles[4 * i], y = c.arboles[4 * i + 1], h = c.arboles[4 * i + 2], palmera = c.arboles[4 * i + 3];
+      const r = palmera ? Math.min(2.6, Math.max(1, h * 0.16)) : Math.min(5.5, Math.max(1.2, h * 0.3));
+      const tr = palmera ? 0.35 : 0.3 + h * 0.012;
+      m.compose(pos.set(x, 0.15 + h - r * 0.85, -y), q, esc.set(r, palmera ? r * 0.55 : r * 0.9, r)); copas.setMatrixAt(i, m);
+      m.compose(pos.set(x, 0.15, -y), q, esc.set(tr, Math.max(0.5, h - r * (palmera ? 0.5 : 1.2)), tr)); troncos.setMatrixAt(i, m);
+    }
+    out.push(copas, troncos);
+  }
+  // semáforos: poste y cabezal
+  const s = c.semaforos.length / 2;
+  if (s) {
+    const postes = new THREE.InstancedMesh(GEO.poste, MAT.semaforo, s), cab = new THREE.InstancedMesh(GEO.cabezal, MAT.semaforo, s);
+    const m = new THREE.Matrix4();
+    for (let i = 0; i < s; i++) { m.makeTranslation(c.semaforos[2 * i], 0.15, -c.semaforos[2 * i + 1]); postes.setMatrixAt(i, m); cab.setMatrixAt(i, m); }
+    out.push(postes, cab);
+  }
+  return out;
+}
 function liberar(grupo) {
-  grupo.traverse((o) => { if (o.geometry) { o.geometry.dispose(); edificiosMallas.delete(o); } if (o.isSprite) { o.material.map.dispose(); o.material.dispose(); } });
+  grupo.traverse((o) => {
+    if (o.isInstancedMesh) { o.dispose(); return; }  // su geometría es compartida (GEO): no se borra
+    if (o.geometry) { o.geometry.dispose(); edificiosMallas.delete(o); }
+    if (o.isSprite) { o.material.map.dispose(); o.material.dispose(); } });
   scene.remove(grupo);
 }
 function distBarrio(b, x, z) {
@@ -533,7 +627,7 @@ function vista(tipo) {
   else camera.position.set(c.x - radio * 0.2, radio * 1.1, c.z + radio * 1.25);
   controls.target.copy(c); controls.update();
 }
-$('b-general').onclick = () => vista('general');
+$('b-general').onclick = () => { fijarZona(-1); vista('general'); };
 $('b-arriba').onclick = () => vista('arriba');
 // de frente a la ochava (mira al este), desde la esquina, a la altura de una persona parada enfrente
 function irAlLocal() { if (!local) return; pin.visible = false; volarA(LOCAL.x - 3, -(LOCAL.y - 4), new THREE.Vector3(26, 6, 4), 3); }
@@ -542,6 +636,67 @@ addEventListener('keydown', (e) => {  // tecla L, salvo mientras se escribe en e
   if ((e.key === 'l' || e.key === 'L') && !e.ctrlKey && !e.metaKey && !e.altKey && !/^(INPUT|TEXTAREA)$/.test(document.activeElement?.tagName)) irAlLocal();
 });
 addEventListener('hashchange', () => { if (location.hash === '#local') irAlLocal(); });
+
+// ---------- lugares (BA Data): un ícono por punto, filtro por categoría y cuántos hay en cada barrio ----------
+let LUGARES = null, zona = -1;  // zona: índice del barrio elegido, o −1 = toda la Ciudad
+const capaLugares = new THREE.Group(); scene.add(capaLugares);
+function icono(color, simbolo) {
+  const c = document.createElement('canvas'); c.width = c.height = 64; const g = c.getContext('2d');
+  g.beginPath(); g.arc(32, 32, 28, 0, Math.PI * 2); g.fillStyle = color; g.fill(); g.lineWidth = 5; g.strokeStyle = '#ffffff'; g.stroke();
+  g.fillStyle = '#ffffff'; g.font = '600 30px "IBM Plex Sans", system-ui, sans-serif'; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText(simbolo, 32, 34);
+  const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; return t;
+}
+const cuantos = (c) => { const p = LUGARES.puntos[c.k]; if (zona < 0) return p.length / 4; let n = 0; for (let i = 2; i < p.length; i += 4) if (p[i] === zona) n++; return n; };
+function armarLugares() {
+  for (const o of [...capaLugares.children]) { o.geometry.dispose(); capaLugares.remove(o); }
+  for (const c of LUGARES.categorias) {
+    if (!AJ.lugares.includes(c.k)) continue;
+    const p = LUGARES.puntos[c.k]; const pos = [], fila = [];
+    for (let i = 0; i < p.length; i += 4) if (zona < 0 || p[i + 2] === zona) { pos.push(p[i], 8, -p[i + 1]); fila.push(i); }
+    if (!pos.length) continue;
+    const g = new THREE.BufferGeometry(); g.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3));
+    const o = new THREE.Points(g, c.mat); o.userData = { c, fila }; o.renderOrder = 12; capaLugares.add(o);
+  }
+}
+function listarLugares() {
+  const grupos = new Map();
+  for (const c of LUGARES.categorias) { if (!grupos.has(c.grupo)) grupos.set(c.grupo, []); grupos.get(c.grupo).push(c); }
+  $('l-lugares').innerHTML = [...grupos].map(([g, cs]) => `<div class="grupo"><h2>${g}</h2>${cs.map((c) => { const n = cuantos(c);
+    return `<label class="interruptor lug"><span><i style="background:${c.color}">${c.simbolo}</i>${c.nombre}</span><b class="${n ? '' : 'cero'}">${n.toLocaleString('es-AR')}</b><input type="checkbox" data-k="${c.k}"${AJ.lugares.includes(c.k) ? ' checked' : ''}></label>`; }).join('')}</div>`).join('');
+}
+function fijarZona(i) { zona = i; $('s-zona').value = String(i); if (LUGARES) { listarLugares(); armarLugares(); } }
+$('l-lugares').addEventListener('change', (e) => {
+  const k = e.target.dataset.k; if (!k) return;
+  AJ.lugares = e.target.checked ? [...AJ.lugares, k] : AJ.lugares.filter((x) => x !== k); guardar(); armarLugares();
+});
+$('s-zona').addEventListener('change', () => { const i = +$('s-zona').value; if (i >= 0) irABarrio(i); else { fijarZona(-1); vista('general'); } });
+async function cargarLugares() {
+  try {
+    const r = await fetch('datos/lugares.json'); if (!r.ok) return; LUGARES = await r.json();
+    for (const c of LUGARES.categorias) c.mat = new THREE.PointsMaterial({ map: icono(c.color, c.simbolo), size: 20, sizeAttenuation: false, transparent: true, alphaTest: 0.2, depthTest: false });
+    $('s-zona').insertAdjacentHTML('beforeend', BARRIOS.map((b, i) => [b.nombre, i]).sort((a, b) => a[0].localeCompare(b[0], 'es')).map(([n, i]) => `<option value="${i}">${n}</option>`).join(''));
+    listarLugares(); armarLugares(); $('b-lugares').hidden = false;
+  } catch { /* sin lugares: la maqueta sigue igual */ }
+}
+let lugarHover = null, ultimo = [0, 0], tamLugar = 20;
+function escalarLugares() {  // de lejos, íconos más chicos para que no tapen la Ciudad
+  if (!LUGARES) return; const d = camera.position.distanceTo(controls.target); const t = d > 6000 ? 10 : d > 2500 ? 14 : 20;
+  if (t !== tamLugar) { tamLugar = t; for (const c of LUGARES.categorias) c.mat.size = t; }
+}
+function lugarBajo() {
+  if (!capaLugares.children.length) return null;
+  ray.setFromCamera(puntero, camera);
+  // el ícono mide tamLugar px en pantalla: el radio de búsqueda en metros crece con la distancia
+  ray.params.Points.threshold = camera.position.distanceTo(controls.target) * 2 * Math.tan(THREE.MathUtils.degToRad(camera.fov / 2)) / innerHeight * tamLugar / 2;
+  const h = ray.intersectObjects(capaLugares.children, false)[0]; if (!h) return null;
+  const { c, fila } = h.object.userData; const p = LUGARES.puntos[c.k], i = fila[h.index];
+  return { c, x: p[i], y: p[i + 1], b: p[i + 2], nombre: p[i + 3] };
+}
+function mostrarFicha(l) {
+  lugarHover = l; const f = $('ficha'); f.hidden = !l; if (!l) return;
+  f.innerHTML = ''; f.append(l.nombre); const s = document.createElement('small'); s.textContent = `${l.c.nombre} · ${BARRIOS[l.b]?.nombre ?? ''}`; f.append(s);
+  f.style.left = Math.min(ultimo[0] + 14, innerWidth - f.offsetWidth - 8) + 'px'; f.style.top = (ultimo[1] + 14) + 'px';
+}
 
 // ---------- barrios: brillo al pasar y zoom al elegir ----------
 let LIMITES = null, hover = -1, colores = null;
@@ -570,15 +725,18 @@ function barrioBajo() {
 function fijarHover(i) { if (i === hover) return; hover = i; canvas.style.cursor = i >= 0 ? 'pointer' : ''; pintarBarrios(); }
 function irABarrio(i) {
   const b = BARRIOS[i]; const ext = Math.max(b.bbox[2] - b.bbox[0], b.bbox[3] - b.bbox[1]);
-  fijarHover(-1); pin.visible = false;
+  fijarHover(-1); pin.visible = false; fijarZona(i);
   volarA((b.bbox[0] + b.bbox[2]) / 2, -(b.bbox[1] + b.bbox[3]) / 2, new THREE.Vector3(-0.15 * ext, 0.75 * ext, 0.8 * ext));
 }
-canvas.addEventListener('pointermove', (e) => { ponerPuntero(e); buscarHover = e.pointerType === 'mouse'; });
-canvas.addEventListener('pointerleave', () => fijarHover(-1));
-canvas.addEventListener('pointerdown', (e) => { if (intro.activo) { terminarIntro(); return; } abajo = [e.clientX, e.clientY]; });
+canvas.addEventListener('pointermove', (e) => { ponerPuntero(e); ultimo = [e.clientX, e.clientY]; buscarHover = e.pointerType === 'mouse'; });
+canvas.addEventListener('pointerleave', () => { fijarHover(-1); mostrarFicha(null); });
+canvas.addEventListener('pointerdown', (e) => { if (intro.activo) { terminarIntro(); return; } mostrarFicha(null); abajo = [e.clientX, e.clientY]; });
 canvas.addEventListener('pointerup', (e) => {  // un clic (o toque) sin arrastrar elige el barrio
   if (!abajo) return; const mov = Math.hypot(e.clientX - abajo[0], e.clientY - abajo[1]); abajo = null;
-  if (mov > 6) return; ponerPuntero(e); const i = barrioBajo(); if (i >= 0) irABarrio(i);
+  if (mov > 6) return; ponerPuntero(e); ultimo = [e.clientX, e.clientY];
+  const l = lugarBajo();  // un lugar tiene prioridad sobre el barrio de abajo; en pantalla táctil, el toque muestra su ficha
+  if (l) { mostrarFicha(l); pin.visible = false; volarA(l.x, -l.y, new THREE.Vector3(-60, 90, 110)); return; }
+  const i = barrioBajo(); if (i >= 0) irABarrio(i);
 });
 
 // ---------- intro: escaneo holográfico de la Ciudad ----------
@@ -670,7 +828,7 @@ aplicarAspecto();
     });
     centro.set((x0 + x1) / 2, 0, -(y0 + y1) / 2); radio = Math.hypot(x1 - x0, y1 - y0) / 2;
     LIMITES = { x0, x1, y0, y1 };
-    aplicarAspecto(); vista('general');
+    aplicarAspecto(); vista('general'); cargarLugares();
     estado.textContent = '';
     if (location.hash === '#local') irAlLocal();  // si el local llegó antes que la Ciudad, la vista general lo pisó
     else iniciarIntro();
@@ -684,9 +842,13 @@ renderer.setAnimationLoop(() => {
     if (vuelo.t >= 1) vuelo = null;
   }
   const ahora = performance.now();
+  capaLugares.visible = !intro.activo; escalarLugares();
   if (intro.activo) actualizarIntro(ahora);
   else {
-    if (buscarHover) { buscarHover = false; fijarHover(barrioBajo()); }
+    if (buscarHover) {
+      buscarHover = false; const l = lugarBajo(); mostrarFicha(l);
+      fijarHover(l ? -1 : barrioBajo()); if (l) canvas.style.cursor = 'pointer';
+    }
     if (hover >= 0) brillo(ahora);
     actualizarCarteles();
   }
