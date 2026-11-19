@@ -178,6 +178,7 @@ body.intro .buscador, body.intro .iconos, body.intro .creditos { opacity: 0; poi
     <label class="interruptor">Nombres de calles <input type="checkbox" id="o-calles"></label>
     <label class="interruptor">Bordes de barrios <input type="checkbox" id="o-bordes"></label>
     <label class="interruptor">Espacios verdes <input type="checkbox" id="o-verdes"></label>
+    <label class="interruptor">Fachadas y terrazas <input type="checkbox" id="o-detalle"></label>
     <label class="interruptor">Árboles <input type="checkbox" id="o-arboles"></label>
     <label class="interruptor">Semáforos <input type="checkbox" id="o-semaforos"></label>
     <label class="interruptor">Créditos en pantalla <input type="checkbox" id="o-creditos"></label>
@@ -250,7 +251,7 @@ const LOCAL = { x: 2326.17, y: 4805.00 };  // vértice norte de la ochava del lo
 if (location.hash !== '#local' && !matchMedia('(prefers-reduced-motion: reduce)').matches) document.body.classList.add('intro');
 
 // ---------- ajustes (se recuerdan en este navegador) ----------
-const AJ_DEF = { paleta: 'auto', edificios: 'lisos', barrios: true, calles: true, bordes: false, verdes: true, arboles: true, semaforos: true, creditos: false,
+const AJ_DEF = { paleta: 'auto', edificios: 'lisos', barrios: true, calles: true, bordes: false, verdes: true, arboles: true, semaforos: true, creditos: false, detalle: true,
   lugares: ['servicio', 'comisaria', 'bomberos', 'hospital'] };
 let AJ = { ...AJ_DEF };
 try { AJ = { ...AJ_DEF, ...JSON.parse(localStorage.getItem('maqueta-ajustes') || '{}') }; } catch {}
@@ -270,7 +271,42 @@ const sol = new THREE.DirectionalLight(0xfff4e6, 1.5); sol.position.set(700, 900
 const MAT = {};
 for (const k of ['calle', 'calzada', 'manzana', 'edificio', 'verde', 'via', 'arbol', 'tronco', 'agua', 'semaforo'])
   MAT[k] = new THREE.MeshLambertMaterial({ color: 0xffffff, side: THREE.DoubleSide, polygonOffset: k === 'manzana' || k === 'verde', polygonOffsetFactor: k === 'verde' ? -2 : -1 });
-const edificiosMallas = new Set();
+const edificiosMallas = new Set(), terrazas = new Set();
+// Fachadas sin texturas: con la altura de cada punto y su posición a lo largo de la pared se dibujan pisos de 2,8 m,
+// ventanas, planta baja, cornisa y medianeras ciegas. De lejos el detalle se apaga solo (fwidth) para que no titile.
+const FACHADA = { uDetalle: { value: 1 }, uNoche: { value: 0 } };
+MAT.edificio.onBeforeCompile = (sh) => {
+  Object.assign(sh.uniforms, FACHADA);
+  sh.vertexShader = sh.vertexShader
+    .replace('#include <common>', '#include <common>\nattribute vec3 fach; attribute float altura; varying vec3 vFach; varying float vY, vH;')
+    .replace('#include <begin_vertex>', '#include <begin_vertex>\nvFach = fach; vY = position.y; vH = altura;');
+  sh.fragmentShader = sh.fragmentShader
+    .replace('#include <common>', '#include <common>\nuniform float uDetalle, uNoche; varying vec3 vFach; varying float vY, vH;')
+    .replace('#include <color_fragment>', `#include <color_fragment>
+      vec3 luzVent = vec3(0.0);
+      if (uDetalle > 0.5 && vFach.z > 0.5) {
+        vec3 base = diffuseColor.rgb; vec3 c = base;
+        float k = 1.0 - smoothstep(0.4, 1.4, max(fwidth(vY), fwidth(vFach.x)));  // menos de ~1 px por metro: liso
+        if (vFach.z < 1.5) {  // fachada o contrafrente
+          float L = vFach.y, piso = floor(vY / 2.8), fy = vY - piso * 2.8;
+          float n = max(1.0, floor(L / 2.8)), m = L / n, fu = fract(vFach.x / m), col = floor(vFach.x / m);
+          float pb = 1.0 - step(1.0, piso);  // planta baja: locales con vidriera
+          float vent = mix(step(0.2, fu) * step(fu, 0.8) * step(0.85, fy) * step(fy, 2.2),
+                           step(0.07, fu) * step(fu, 0.93) * step(0.3, fy) * step(fy, 2.45), pb)
+                       * step(1.5, L) * step(vY, vH - 0.5);
+          c *= mix(1.0, 0.85, step(fy, 0.2));        // losa de cada piso
+          c *= mix(1.0, 0.9, pb);                       // zócalo
+          c = mix(c, base * 1.06, step(vH - 0.45, vY)); // cornisa
+          vec3 vidrio = base * 0.3 + vec3(0.03, 0.045, 0.07);
+          float pr = fract(sin(dot(vec3(piso, col, floor(vH * 3.0 + L * 7.0)), vec3(12.9898, 78.233, 37.719))) * 43758.5453);
+          float prende = uNoche * step(0.7, pr) * vent * k;
+          c = mix(c, vidrio, vent);
+          luzVent = vec3(1.0, 0.78, 0.45) * prende * 0.9;
+        } else c *= vec3(0.92, 0.88, 0.83);  // medianera: ciega, revoque
+        diffuseColor.rgb = mix(base, c, k);
+      }`)
+    .replace('#include <emissivemap_fragment>', '#include <emissivemap_fragment>\ntotalEmissiveRadiance += luzVent;');
+};
 function colorearEdificios(m) {  // "por altura": del tono base al tono alto, de 0 a 60 m
   const g = m.geometry; const alt = g.getAttribute('altura'); if (!alt) return;
   const c0 = new THREE.Color(css('--edificio')), c1 = new THREE.Color(css('--edificio-alto')); const c = new THREE.Color();
@@ -292,7 +328,9 @@ function aplicarAspecto() {
   document.querySelectorAll('[data-ajuste]').forEach((g) => g.querySelectorAll('button').forEach((b) => b.setAttribute('aria-pressed', String(AJ[g.dataset.ajuste] === b.dataset.valor))));
   $('o-barrios').checked = AJ.barrios; $('o-calles').checked = AJ.calles; $('o-bordes').checked = AJ.bordes;
   $('o-verdes').checked = AJ.verdes; $('o-creditos').checked = AJ.creditos;
-  $('o-arboles').checked = AJ.arboles; $('o-semaforos').checked = AJ.semaforos;
+  $('o-arboles').checked = AJ.arboles; $('o-semaforos').checked = AJ.semaforos; $('o-detalle').checked = AJ.detalle;
+  FACHADA.uDetalle.value = AJ.detalle ? 1 : 0; FACHADA.uNoche.value = new THREE.Color(css('--cielo')).getHSL({}).l < 0.3 ? 1 : 0;
+  for (const m of terrazas) m.visible = AJ.detalle;
   MAT.arbol.visible = MAT.tronco.visible = AJ.arboles; MAT.semaforo.visible = AJ.semaforos;
 }
 matchMedia('(prefers-color-scheme: dark)').addEventListener('change', aplicarAspecto);
@@ -311,40 +349,55 @@ for (const id of PANELES) $('b-' + id).onclick = () => alternar($('b-' + id), $(
 document.querySelectorAll('[data-ajuste]').forEach((g) => g.addEventListener('click', (e) => {
   const b = e.target.closest('button'); if (!b) return; AJ[g.dataset.ajuste] = b.dataset.valor; guardar(); aplicarAspecto();
 }));
-for (const k of ['barrios', 'calles', 'bordes', 'verdes', 'arboles', 'semaforos', 'creditos'])
+for (const k of ['barrios', 'calles', 'bordes', 'verdes', 'arboles', 'semaforos', 'creditos', 'detalle'])
   $('o-' + k).addEventListener('change', (e) => { AJ[k] = e.target.checked; guardar(); aplicarAspecto(); });
 addEventListener('keydown', (e) => { if (e.key === 'Escape') for (const id of PANELES) { $('p-' + id).hidden = true; $('b-' + id).setAttribute('aria-expanded', 'false'); } });
 
 // ---------- geometría ----------
 const areaPlan = (a) => { let s = 0; for (let i = 0, n = a.length / 2; i < n; i++) { const j = (i + n - 1) % n; s += a[2 * j] * -a[2 * i + 1] - a[2 * i] * -a[2 * j + 1]; } return s / 2; };
 class Juntador {
-  constructor() { this.pos = []; this.nor = []; this.idx = []; this.alt = []; }
+  constructor() { this.pos = []; this.nor = []; this.idx = []; this.alt = []; this.fac = []; }
   techo(anillos, y, h = 0) {
     const v2 = anillos.map((a) => { const o = []; for (let i = 0; i < a.length; i += 2) o.push(new THREE.Vector2(a[i], a[i + 1])); return o; });
     let tri; try { tri = THREE.ShapeUtils.triangulateShape(v2[0], v2.slice(1)); } catch { return; }
     const b = this.pos.length / 3;
-    for (const anillo of v2) for (const q of anillo) { this.pos.push(q.x, y, q.y); this.nor.push(0, 1, 0); this.alt.push(h); }
+    for (const anillo of v2) for (const q of anillo) { this.pos.push(q.x, y, q.y); this.nor.push(0, 1, 0); this.alt.push(h); this.fac.push(0, 0, 0); }
     for (const t of tri) this.idx.push(b + t[0], b + t[2], b + t[1]);
   }
-  paredes(anillos, h) {
+  // Paredes de edificio: la parte que tapa el vecino no se dibuja; lo que asoma por encima de él es medianera (ciega).
+  fachadas(anillos, h, vecino) {
     anillos.forEach((a, k) => {
       const n = a.length / 2; const s = areaPlan(a); const izquierda = k === 0 ? s < 0 : s > 0;
       for (let i = 0; i < n; i++) {
         const j = (i + 1) % n; const x0 = a[2 * i], z0 = a[2 * i + 1], x1 = a[2 * j], z1 = a[2 * j + 1];
+        const v = vecino(x0, z0, x1, z1, h); if (v >= h) continue;
         const dx = x1 - x0, dy = -(z1 - z0); const L = Math.hypot(dx, dy) || 1;
         let nx = -dy / L, ny = dx / L; if (!izquierda) { nx = -nx; ny = -ny; }
-        const b = this.pos.length / 3;
-        this.pos.push(x0, 0, z0, x1, 0, z1, x1, h, z1, x0, h, z0);
+        const b = this.pos.length / 3, t = v > 0 ? 2 : 1;
+        this.pos.push(x0, v, z0, x1, v, z1, x1, h, z1, x0, h, z0);
         for (let m = 0; m < 4; m++) { this.nor.push(nx, 0, -ny); this.alt.push(h); }
+        this.fac.push(0, L, t, L, L, t, L, L, t, 0, L, t);
         this.idx.push(b, b + 1, b + 2, b, b + 2, b + 3);
       }
     });
+  }
+  caja(cx, cz, ux, uz, w, d, y0, y1, h) {  // caja con tapa, girada según (ux, uz); paredes lisas (fach = 0)
+    const vx = -uz, vz = ux, q = [[-w, -d], [w, -d], [w, d], [-w, d]].map(([a, c]) => [cx + ux * a + vx * c, cz + uz * a + vz * c]);
+    for (let i = 0; i < 4; i++) {
+      const [x0, z0] = q[i], [x1, z1] = q[(i + 1) % 4]; const L = Math.hypot(x1 - x0, z1 - z0) || 1; const b = this.pos.length / 3;
+      this.pos.push(x0, y0, z0, x1, y0, z1, x1, y1, z1, x0, y1, z0);
+      for (let m = 0; m < 4; m++) { this.nor.push((z1 - z0) / L, 0, -(x1 - x0) / L); this.alt.push(h); this.fac.push(0, 0, 0); }
+      this.idx.push(b, b + 2, b + 1, b, b + 3, b + 2);
+    }
+    const b = this.pos.length / 3;
+    for (const [x, z] of q) { this.pos.push(x, y1, z); this.nor.push(0, 1, 0); this.alt.push(h); this.fac.push(0, 0, 0); }
+    this.idx.push(b, b + 2, b + 1, b, b + 3, b + 2);
   }
   malla(mat, conAltura = false) {
     const g = new THREE.BufferGeometry();
     g.setAttribute('position', new THREE.Float32BufferAttribute(this.pos, 3));
     g.setAttribute('normal', new THREE.Float32BufferAttribute(this.nor, 3));
-    if (conAltura) g.setAttribute('altura', new THREE.Float32BufferAttribute(this.alt, 1));
+    if (conAltura) { g.setAttribute('altura', new THREE.Float32BufferAttribute(this.alt, 1)); g.setAttribute('fach', new THREE.Float32BufferAttribute(this.fac, 3)); }
     g.setIndex(this.idx.length > 65535 ? new THREE.Uint32BufferAttribute(this.idx, 1) : new THREE.Uint16BufferAttribute(this.idx, 1));
     g.computeBoundingSphere(); return new THREE.Mesh(g, mat);
   }
@@ -396,9 +449,30 @@ async function armarBarrio(b) {
     }
   });
   grupo.add(vias.malla(MAT.via));
-  const edif = new Juntador(); recorrer(ed, ox, oy, (a, g) => { const h = ed.H[g] / 10; edif.techo(a, h, h); edif.paredes(a, h); });
+  // paredes compartidas: cada lado de cada volumen con las alturas de todos los volúmenes que lo usan
+  const lado = (x0, z0, x1, z1) => { const a = Math.round(x0 * 10) + ',' + Math.round(z0 * 10), b = Math.round(x1 * 10) + ',' + Math.round(z1 * 10); return a < b ? a + '|' + b : b + '|' + a; };
+  const lados = new Map();
+  recorrer(ed, ox, oy, (an, g) => { const h = ed.H[g] / 10; for (const a of an) for (let i = 0, n = a.length / 2; i < n; i++) {
+    const j = (i + 1) % n, k = lado(a[2 * i], a[2 * i + 1], a[2 * j], a[2 * j + 1]); const l = lados.get(k); if (l) l.push(h); else lados.set(k, [h]); } });
+  const vecino = (x0, z0, x1, z1, h) => { const l = lados.get(lado(x0, z0, x1, z1)); if (!l || l.length < 2) return 0;
+    let v = 0, propio = false; for (const x of l) { if (x === h && !propio) propio = true; else if (x > v) v = x; } return v; };
+  // shortcut: solo cuenta lados idénticos; un vecino partido en otros vértices deja esa pared como fachada
+  const edif = new Juntador(), terr = new Juntador();
+  recorrer(ed, ox, oy, (a, g) => {
+    const h = ed.H[g] / 10; edif.techo(a, h, h); edif.fachadas(a, h, vecino);
+    // terraza: casilla de máquinas con tanque de agua en ~2 de cada 3 edificios de 3 pisos o más
+    const r = a[0], area = Math.abs(areaPlan(r)); if (h < 8 || area < 60 || (g * 0.6180339887) % 1 > 0.66) return;
+    let cx = 0, cz = 0, n = r.length / 2, ux = 1, uz = 0, Lm = 0;
+    for (let i = 0; i < n; i++) { cx += r[2 * i]; cz += r[2 * i + 1]; const j = (i + 1) % n, dx = r[2 * j] - r[2 * i], dz = r[2 * j + 1] - r[2 * i + 1], L = Math.hypot(dx, dz); if (L > Lm) { Lm = L; ux = dx / L; uz = dz / L; } }
+    cx /= n; cz /= n; let ins = false;
+    for (let i = 0, j = n - 1; i < n; j = i++) { const zi = r[2 * i + 1], zj = r[2 * j + 1]; if ((zi > cz) !== (zj > cz) && cx < (r[2 * j] - r[2 * i]) * (cz - zi) / (zj - zi) + r[2 * i]) ins = !ins; }
+    if (!ins) return;
+    terr.caja(cx, cz, ux, uz, 1.4, 1.4, h, h + 2.6, h);
+    terr.caja(cx + ux * 0.3, cz + uz * 0.3, ux, uz, 0.9, 0.9, h + 2.6, h + 3.8, h);
+  });
   const mEd = edif.malla(MAT.edificio, true); grupo.add(mEd); edificiosMallas.add(mEd);
-  if (AJ.edificios === 'altura') colorearEdificios(mEd);
+  if (terr.pos.length) { const mT = terr.malla(MAT.edificio, true); mT.visible = AJ.detalle; grupo.add(mT); edificiosMallas.add(mT); terrazas.add(mT); }
+  if (AJ.edificios === 'altura') for (const m of grupo.children) if (edificiosMallas.has(m)) colorearEdificios(m);
   grupo.add(...capasDe(BARRIOS.indexOf(b), await leerCapas(b.slug)));
   grupo.add(...cartelesDe(BARRIOS.indexOf(b)));
   return grupo;
@@ -469,7 +543,7 @@ function capasDe(bi, c) {
 function liberar(grupo) {
   grupo.traverse((o) => {
     if (o.isInstancedMesh) { o.dispose(); return; }  // su geometría es compartida (GEO): no se borra
-    if (o.geometry) { o.geometry.dispose(); edificiosMallas.delete(o); }
+    if (o.geometry) { o.geometry.dispose(); edificiosMallas.delete(o); terrazas.delete(o); }
     if (o.isSprite) { o.material.map.dispose(); o.material.dispose(); } });
   scene.remove(grupo);
 }
@@ -681,7 +755,7 @@ async function cargarLugares() {
 let lugarHover = null, ultimo = [0, 0], tamLugar = 20;
 function escalarLugares() {  // de lejos, íconos más chicos para que no tapen la Ciudad
   if (!LUGARES) return; const d = camera.position.distanceTo(controls.target); const t = d > 6000 ? 10 : d > 2500 ? 14 : 20;
-  if (t !== tamLugar) { tamLugar = t; for (const c of LUGARES.categorias) c.mat.size = t; }
+  if (t !== tamLugar) { tamLugar = t; for (const c of LUGARES.categorias) { c.mat.size = t; c.mat.depthTest = t < 20; } }  // de cerca, los edificios tapan lo que está detrás
 }
 function lugarBajo() {
   if (!capaLugares.children.length) return null;
