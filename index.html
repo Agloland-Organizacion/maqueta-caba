@@ -122,6 +122,12 @@ body.intro .buscador, body.intro .iconos, body.intro .creditos { opacity: 0; poi
 .lug i { flex: none; width: 18px; height: 18px; border-radius: 50%; display: grid; place-items: center; font: 600 10px var(--sans); font-style: normal; color: #fff; }
 .lug b { margin-left: auto; font: 12px var(--mono); font-weight: 400; font-variant-numeric: tabular-nums; color: var(--tenue); }
 .lug b.cero { opacity: .5; }
+.sol { display: grid; gap: 8px; }
+.sol label { display: grid; grid-template-columns: 44px 1fr; align-items: center; gap: 8px; color: var(--tenue); }
+.sol input[type="date"] { font: 13px var(--sans); color: var(--tinta); background: transparent; border: 1px solid var(--linea); border-radius: 6px; padding: 5px 8px; color-scheme: light dark; }
+.sol input[type="range"] { width: 100%; accent-color: var(--acento); }
+.sol-pie { display: flex; justify-content: space-between; align-items: center; gap: 8px; font: 12px var(--mono); color: var(--tenue); }
+.sol[aria-disabled="true"] { opacity: .45; }
 .ficha { position: fixed; padding: 6px 9px; pointer-events: none; font-size: 12px; line-height: 1.4; max-width: 260px; z-index: 5; }
 .ficha small { display: block; color: var(--tenue); font-size: 11px; }
 @media (prefers-reduced-motion: reduce) { .interruptor input, .interruptor input::after, .buscador, .iconos, .creditos, .destello { transition: none; } }
@@ -133,7 +139,7 @@ body.intro .buscador, body.intro .iconos, body.intro .creditos { opacity: 0; poi
 <div class="buscador vidrio">
   <form id="f-buscar" autocomplete="off" role="search">
     <label for="q" class="sr" hidden>Buscar una dirección o una esquina</label>
-    <input id="q" list="l-calles" placeholder="Buscar dirección o esquina" spellcheck="false" aria-label="Buscar una dirección o una esquina">
+    <input id="q" list="l-calles" placeholder="Buscar dirección, esquina o edificio" spellcheck="false" aria-label="Buscar una dirección o una esquina">
     <button type="submit" class="ir">Ir</button>
   </form>
   <datalist id="l-calles"></datalist>
@@ -146,6 +152,9 @@ body.intro .buscador, body.intro .iconos, body.intro .creditos { opacity: 0; poi
   </button>
   <button class="ic vidrio" id="b-lugares" type="button" aria-expanded="false" aria-controls="p-lugares" title="Lugares" hidden>
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-6-5.6-6-10.5a6 6 0 0 1 12 0C18 15.4 12 21 12 21z"/><circle cx="12" cy="10.5" r="2.2"/></svg>
+  </button>
+  <button class="ic vidrio" id="b-capas" type="button" aria-expanded="false" aria-controls="p-capas" title="Capas">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4l8 4-8 4-8-4 8-4z"/><path d="M4 12l8 4 8-4"/><path d="M4 16l8 4 8-4"/></svg>
   </button>
   <button class="ic vidrio" id="b-ajustes" type="button" aria-expanded="false" aria-controls="p-ajustes" title="Ajustes">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><path d="M4 7h10M18 7h2M4 17h4M12 17h8"/><circle cx="16" cy="7" r="2"/><circle cx="10" cy="17" r="2"/></svg>
@@ -173,14 +182,7 @@ body.intro .buscador, body.intro .iconos, body.intro .creditos { opacity: 0; poi
     </div>
   </div>
   <div class="grupo">
-    <h2>Mostrar</h2>
-    <label class="interruptor">Nombres de barrios <input type="checkbox" id="o-barrios"></label>
-    <label class="interruptor">Nombres de calles <input type="checkbox" id="o-calles"></label>
-    <label class="interruptor">Bordes de barrios <input type="checkbox" id="o-bordes"></label>
-    <label class="interruptor">Espacios verdes <input type="checkbox" id="o-verdes"></label>
-    <label class="interruptor">Fachadas y terrazas <input type="checkbox" id="o-detalle"></label>
-    <label class="interruptor">Árboles <input type="checkbox" id="o-arboles"></label>
-    <label class="interruptor">Semáforos <input type="checkbox" id="o-semaforos"></label>
+    <h2>Pantalla</h2>
     <label class="interruptor">Créditos en pantalla <input type="checkbox" id="o-creditos"></label>
   </div>
   <div class="grupo">
@@ -191,6 +193,52 @@ body.intro .buscador, body.intro .iconos, body.intro .creditos { opacity: 0; poi
       <button type="button" id="b-local" hidden>El local</button>
     </div>
   </div>
+</section>
+
+<section class="panel vidrio" id="p-capas" hidden aria-label="Capas">
+  <div class="grupo">
+    <h2>Ciudad</h2>
+    <label class="interruptor">Edificios <input type="checkbox" id="o-volumenes"></label>
+    <label class="interruptor">Fachadas y terrazas <input type="checkbox" id="o-detalle"></label>
+    <label class="interruptor">Edificios conocidos <input type="checkbox" id="o-hitos"></label>
+    <label class="interruptor">Manzanas <input type="checkbox" id="o-manzanas"></label>
+    <label class="interruptor">Calles <input type="checkbox" id="o-calzadas"></label>
+  </div>
+  <div class="grupo">
+    <h2>Verde y agua</h2>
+    <label class="interruptor">Espacios verdes <input type="checkbox" id="o-verdes"></label>
+    <label class="interruptor">Árboles <input type="checkbox" id="o-arboles"></label>
+    <div class="chips" data-ajuste="densidad" aria-label="Cuántos árboles">
+      <button type="button" data-valor="todos">Todos</button>
+      <button type="button" data-valor="mitad">La mitad</button>
+      <button type="button" data-valor="pocos">Pocos</button>
+    </div>
+    <label class="interruptor">Lagos <input type="checkbox" id="o-agua"></label>
+  </div>
+  <div class="grupo">
+    <h2>Transporte</h2>
+    <label class="interruptor">Subte <input type="checkbox" id="o-subte"></label>
+    <label class="interruptor">Tren <input type="checkbox" id="o-tren"></label>
+    <label class="interruptor">Semáforos <input type="checkbox" id="o-semaforos"></label>
+  </div>
+  <div class="grupo">
+    <h2>Nombres</h2>
+    <label class="interruptor">Barrios <input type="checkbox" id="o-barrios"></label>
+    <label class="interruptor">Calles <input type="checkbox" id="o-calles"></label>
+    <label class="interruptor">Edificios conocidos <input type="checkbox" id="o-nhitos"></label>
+    <label class="interruptor">Estaciones de subte <input type="checkbox" id="o-nsubte"></label>
+    <label class="interruptor">Bordes de barrios <input type="checkbox" id="o-bordes"></label>
+  </div>
+  <div class="grupo">
+    <h2>Sol y sombras</h2>
+    <label class="interruptor">Sombras del sol <input type="checkbox" id="o-sombras"></label>
+    <div class="sol" id="c-sol">
+      <label>Día <input type="date" id="i-fecha"></label>
+      <label>Hora <input type="range" id="i-hora" min="5" max="21" step="0.25"></label>
+      <div class="sol-pie"><output id="t-sol"></output><button type="button" id="b-ahora">Ahora</button></div>
+    </div>
+  </div>
+  <p class="nota">Edificios conocidos: forma de OpenStreetMap; el Barolo, la Floralis y los dos puentes, armados a mano con medidas aproximadas. Subte: estaciones de SBASE unidas en línea recta.</p>
 </section>
 
 <section class="panel vidrio" id="p-lugares" hidden aria-label="Lugares">
@@ -215,7 +263,7 @@ body.intro .buscador, body.intro .iconos, body.intro .creditos { opacity: 0; poi
   </div>
   <p class="nota">Los barrios se cargan solos alrededor de lo que mirás. Arrastrar: mover · clic derecho o dos dedos: girar · rueda o pellizco: acercar.</p>
   <p class="nota">Alturas de Tejido Urbano en escalones de 2,8 m (pisos), relevamiento hasta 2021.</p>
-  <p class="nota">Datos: BA Data (GCBA), CC-BY 2.5 AR · Tejido Urbano, callejero, manzanas, espacios verdes, ferrocarril, barrios, arbolado, semáforos y lugares (estaciones de servicio, comisarías, bomberos, salud, educación, cultura, deporte y servicios).</p>
+  <p class="nota">Datos: BA Data (GCBA), CC-BY 2.5 AR · Tejido Urbano, callejero, manzanas, espacios verdes, ferrocarril, barrios, arbolado, semáforos, subte (SBASE) y lugares (estaciones de servicio, comisarías, bomberos, salud, educación, cultura, deporte y servicios). Edificios conocidos: © OpenStreetMap contributors (ODbL).</p>
 </section>
 
 <div class="lineas-scan" id="lineas-scan" hidden></div>
@@ -228,7 +276,7 @@ body.intro .buscador, body.intro .iconos, body.intro .creditos { opacity: 0; poi
 <div class="destello" id="destello"></div>
 <div class="ficha vidrio" id="ficha" hidden></div>
 <div class="estado" id="estado" aria-live="polite">Cargando la Ciudad…</div>
-<div class="creditos">Datos: BA Data (GCBA), CC-BY 2.5 AR</div>
+<div class="creditos">Datos: BA Data (GCBA), CC-BY 2.5 AR · © OpenStreetMap contributors</div>
 
 <script type="importmap">
 { "imports": {
@@ -252,7 +300,10 @@ if (location.hash !== '#local' && !matchMedia('(prefers-reduced-motion: reduce)'
 
 // ---------- ajustes (se recuerdan en este navegador) ----------
 const AJ_DEF = { paleta: 'auto', edificios: 'lisos', barrios: true, calles: true, bordes: false, verdes: true, arboles: true, semaforos: true, creditos: false, detalle: true,
-  lugares: ['servicio', 'comisaria', 'bomberos', 'hospital'] };
+  volumenes: true, hitos: true, manzanas: true, calzadas: true, agua: true, subte: true, tren: true, nhitos: true, nsubte: true, sombras: false,
+  densidad: 'mitad', lugares: ['servicio', 'comisaria', 'bomberos', 'hospital'] };
+const CAPAS = ['barrios', 'calles', 'bordes', 'verdes', 'arboles', 'semaforos', 'creditos', 'detalle', 'volumenes', 'hitos', 'manzanas', 'calzadas', 'agua', 'subte', 'tren', 'nhitos', 'nsubte', 'sombras'];
+const DENSIDAD = { todos: 1, mitad: 0.5, pocos: 0.2 };  // parte de los árboles censados que se dibuja
 let AJ = { ...AJ_DEF };
 try { AJ = { ...AJ_DEF, ...JSON.parse(localStorage.getItem('maqueta-ajustes') || '{}') }; } catch {}
 const guardar = () => { try { localStorage.setItem('maqueta-ajustes', JSON.stringify(AJ)); } catch {} };
@@ -326,12 +377,15 @@ function aplicarAspecto() {
   MAT.verde.visible = AJ.verdes;
   pintarBarrios();
   document.querySelectorAll('[data-ajuste]').forEach((g) => g.querySelectorAll('button').forEach((b) => b.setAttribute('aria-pressed', String(AJ[g.dataset.ajuste] === b.dataset.valor))));
-  $('o-barrios').checked = AJ.barrios; $('o-calles').checked = AJ.calles; $('o-bordes').checked = AJ.bordes;
-  $('o-verdes').checked = AJ.verdes; $('o-creditos').checked = AJ.creditos;
-  $('o-arboles').checked = AJ.arboles; $('o-semaforos').checked = AJ.semaforos; $('o-detalle').checked = AJ.detalle;
+  for (const k of CAPAS) $('o-' + k).checked = AJ[k];
   FACHADA.uDetalle.value = AJ.detalle ? 1 : 0; FACHADA.uNoche.value = new THREE.Color(css('--cielo')).getHSL({}).l < 0.3 ? 1 : 0;
   for (const m of terrazas) m.visible = AJ.detalle;
   MAT.arbol.visible = MAT.tronco.visible = AJ.arboles; MAT.semaforo.visible = AJ.semaforos;
+  for (const m of arbolesMallas) m.count = Math.ceil(m.userData.n * DENSIDAD[AJ.densidad]);
+  MAT.edificio.visible = AJ.volumenes; MAT.manzana.visible = AJ.manzanas; MAT.calzada.visible = MAT_PINTURA.visible = AJ.calzadas;
+  MAT.agua.visible = AJ.agua; MAT.via.visible = AJ.tren;
+  capaHitos.visible = AJ.hitos; capaSubte.visible = AJ.subte; pintarHitos(); pintarSubte();
+  $('c-sol').setAttribute('aria-disabled', String(!AJ.sombras)); ponerSol();
 }
 matchMedia('(prefers-color-scheme: dark)').addEventListener('change', aplicarAspecto);
 new MutationObserver(aplicarAspecto).observe(raiz, { attributes: true, attributeFilter: ['data-theme'] });
@@ -344,13 +398,15 @@ function alternar(boton, panel) {
   for (const id of PANELES) { $('p-' + id).hidden = true; $('b-' + id).setAttribute('aria-expanded', 'false'); }
   panel.hidden = !abrir; boton.setAttribute('aria-expanded', String(abrir));
 }
-const PANELES = ['lugares', 'ajustes', 'info'];
+const PANELES = ['lugares', 'capas', 'ajustes', 'info'];
 for (const id of PANELES) $('b-' + id).onclick = () => alternar($('b-' + id), $('p-' + id));
 document.querySelectorAll('[data-ajuste]').forEach((g) => g.addEventListener('click', (e) => {
   const b = e.target.closest('button'); if (!b) return; AJ[g.dataset.ajuste] = b.dataset.valor; guardar(); aplicarAspecto();
 }));
-for (const k of ['barrios', 'calles', 'bordes', 'verdes', 'arboles', 'semaforos', 'creditos', 'detalle'])
-  $('o-' + k).addEventListener('change', (e) => { AJ[k] = e.target.checked; guardar(); aplicarAspecto(); });
+for (const k of CAPAS) $('o-' + k).addEventListener('change', (e) => {
+  AJ[k] = e.target.checked; guardar(); aplicarAspecto();
+  if (k === 'hitos') recargarBarrios();  // con o sin hitos cambia qué volúmenes de Tejido se dibujan
+});
 addEventListener('keydown', (e) => { if (e.key === 'Escape') for (const id of PANELES) { $('p-' + id).hidden = true; $('b-' + id).setAttribute('aria-expanded', 'false'); } });
 
 // ---------- geometría ----------
@@ -452,13 +508,16 @@ async function armarBarrio(b) {
   // paredes compartidas: cada lado de cada volumen con las alturas de todos los volúmenes que lo usan
   const lado = (x0, z0, x1, z1) => { const a = Math.round(x0 * 10) + ',' + Math.round(z0 * 10), b = Math.round(x1 * 10) + ',' + Math.round(z1 * 10); return a < b ? a + '|' + b : b + '|' + a; };
   const lados = new Map();
-  recorrer(ed, ox, oy, (an, g) => { const h = ed.H[g] / 10; for (const a of an) for (let i = 0, n = a.length / 2; i < n; i++) {
+  const saco = new Uint8Array(ed.G.length);  // volúmenes de Tejido que tapa un edificio conocido
+  if (AJ.hitos) recorrer(ed, ox, oy, (an, g) => { saco[g] = enHito(an[0]) ? 1 : 0; });
+  recorrer(ed, ox, oy, (an, g) => { if (saco[g]) return; const h = ed.H[g] / 10; for (const a of an) for (let i = 0, n = a.length / 2; i < n; i++) {
     const j = (i + 1) % n, k = lado(a[2 * i], a[2 * i + 1], a[2 * j], a[2 * j + 1]); const l = lados.get(k); if (l) l.push(h); else lados.set(k, [h]); } });
   const vecino = (x0, z0, x1, z1, h) => { const l = lados.get(lado(x0, z0, x1, z1)); if (!l || l.length < 2) return 0;
     let v = 0, propio = false; for (const x of l) { if (x === h && !propio) propio = true; else if (x > v) v = x; } return v; };
   // shortcut: solo cuenta lados idénticos; un vecino partido en otros vértices deja esa pared como fachada
   const edif = new Juntador(), terr = new Juntador();
   recorrer(ed, ox, oy, (a, g) => {
+    if (saco[g]) return;
     const h = ed.H[g] / 10; edif.techo(a, h, h); edif.fachadas(a, h, vecino);
     // terraza: casilla de máquinas con tanque de agua en ~2 de cada 3 edificios de 3 pisos o más
     const r = a[0], area = Math.abs(areaPlan(r)); if (h < 8 || area < 60 || (g * 0.6180339887) % 1 > 0.66) return;
@@ -474,7 +533,9 @@ async function armarBarrio(b) {
   if (terr.pos.length) { const mT = terr.malla(MAT.edificio, true); mT.visible = AJ.detalle; grupo.add(mT); edificiosMallas.add(mT); terrazas.add(mT); }
   if (AJ.edificios === 'altura') for (const m of grupo.children) if (edificiosMallas.has(m)) colorearEdificios(m);
   grupo.add(...capasDe(BARRIOS.indexOf(b), await leerCapas(b.slug)));
+  for (const m of grupo.children) { m.receiveShadow = true; if (edificiosMallas.has(m)) m.castShadow = true; }
   grupo.add(...cartelesDe(BARRIOS.indexOf(b)));
+  sombraSucia = true;
   return grupo;
 }
 
@@ -521,13 +582,16 @@ function capasDe(bi, c) {
   if (n) {
     const copas = new THREE.InstancedMesh(GEO.copa, MAT.arbol, n), troncos = new THREE.InstancedMesh(GEO.tronco, MAT.tronco, n);
     const m = new THREE.Matrix4(), q = new THREE.Quaternion(), pos = new THREE.Vector3(), esc = new THREE.Vector3();
-    for (let i = 0; i < n; i++) {
-      const x = c.arboles[4 * i], y = c.arboles[4 * i + 1], h = c.arboles[4 * i + 2], palmera = c.arboles[4 * i + 3];
+    // orden salteado (número áureo): "la mitad" o "pocos" dibuja los primeros y quedan parejos por toda la ciudad
+    const orden = Array.from({ length: n }, (_, i) => i).sort((a, b) => (a * 0.6180339887) % 1 - (b * 0.6180339887) % 1);
+    for (let k = 0; k < n; k++) {
+      const i = orden[k], x = c.arboles[4 * i], y = c.arboles[4 * i + 1], h = c.arboles[4 * i + 2], palmera = c.arboles[4 * i + 3];
       const r = palmera ? Math.min(2.6, Math.max(1, h * 0.16)) : Math.min(5.5, Math.max(1.2, h * 0.3));
       const tr = palmera ? 0.35 : 0.3 + h * 0.012;
-      m.compose(pos.set(x, 0.15 + h - r * 0.85, -y), q, esc.set(r, palmera ? r * 0.55 : r * 0.9, r)); copas.setMatrixAt(i, m);
-      m.compose(pos.set(x, 0.15, -y), q, esc.set(tr, Math.max(0.5, h - r * (palmera ? 0.5 : 1.2)), tr)); troncos.setMatrixAt(i, m);
+      m.compose(pos.set(x, 0.15 + h - r * 0.85, -y), q, esc.set(r, palmera ? r * 0.55 : r * 0.9, r)); copas.setMatrixAt(k, m);
+      m.compose(pos.set(x, 0.15, -y), q, esc.set(tr, Math.max(0.5, h - r * (palmera ? 0.5 : 1.2)), tr)); troncos.setMatrixAt(k, m);
     }
+    for (const t of [copas, troncos]) { t.userData.n = n; t.count = Math.ceil(n * DENSIDAD[AJ.densidad]); t.castShadow = true; arbolesMallas.add(t); }
     out.push(copas, troncos);
   }
   // semáforos: poste y cabezal
@@ -542,11 +606,179 @@ function capasDe(bi, c) {
 }
 function liberar(grupo) {
   grupo.traverse((o) => {
-    if (o.isInstancedMesh) { o.dispose(); return; }  // su geometría es compartida (GEO): no se borra
+    if (o.isInstancedMesh) { arbolesMallas.delete(o); o.dispose(); return; }  // su geometría es compartida (GEO): no se borra
     if (o.geometry) { o.geometry.dispose(); edificiosMallas.delete(o); terrazas.delete(o); }
     if (o.isSprite) { o.material.map.dispose(); o.material.dispose(); } });
   scene.remove(grupo);
 }
+function recargarBarrios() { for (const { g } of cargados.values()) liberar(g); cargados.clear(); }
+
+// ---------- edificios conocidos (OpenStreetMap y a mano): paredes, techo plano, pirámide, cúpula, a un agua, a dos aguas ----------
+let HITOS = null; const HUELLAS = [];
+const capaHitos = new THREE.Group(); scene.add(capaHitos);
+const cartelesHitos = new THREE.Group(); scene.add(cartelesHitos);
+const MAT_HITO = new THREE.MeshLambertMaterial({ vertexColors: true, side: THREE.DoubleSide });
+function dentro(a, x, z) {
+  let ins = false;
+  for (let i = 0, n = a.length / 2, j = n - 1; i < n; j = i++) { const zi = a[2 * i + 1], zj = a[2 * j + 1]; if ((zi > z) !== (zj > z) && x < (a[2 * j] - a[2 * i]) * (z - zi) / (zj - zi) + a[2 * i]) ins = !ins; }
+  return ins;
+}
+function enHito(a) {  // a: anillo de un volumen de Tejido, en coordenadas de escena
+  if (!HUELLAS.length) return false;
+  let cx = 0, cz = 0; const n = a.length / 2; for (let i = 0; i < n; i++) { cx += a[2 * i]; cz += a[2 * i + 1]; } cx /= n; cz /= n;
+  return HUELLAS.some((h) => cx > h.x0 && cx < h.x1 && cz > h.z0 && cz < h.z1 && h.anillos.some((r) => dentro(r, cx, cz)));
+}
+function prepararHuellas() {
+  for (const h of HITOS.hitos) for (const r of h.huella) {
+    const a = new Float32Array(r.length); let x0 = Infinity, x1 = -Infinity, z0 = Infinity, z1 = -Infinity;
+    for (let i = 0; i < r.length; i += 2) { a[i] = r[i]; a[i + 1] = -r[i + 1]; x0 = Math.min(x0, a[i]); x1 = Math.max(x1, a[i]); z0 = Math.min(z0, a[i + 1]); z1 = Math.max(z1, a[i + 1]); }
+    HUELLAS.push({ x0, x1, z0, z1, anillos: [a] });
+  }
+}
+function pintarHitos() {
+  if (!HITOS) return;
+  for (const o of [...capaHitos.children]) { o.geometry.dispose(); capaHitos.remove(o); }
+  const pos = [], col = [], base = new THREE.Color(css('--edificio')), c = new THREE.Color(), ct = new THREE.Color();
+  // con paleta clara van sus colores reales; con la oscura o la de papel, mezclados con el tono de los edificios
+  const mezcla = new THREE.Color(css('--cielo')).getHSL({}).l < 0.3 || AJ.paleta === 'papel' ? 0.6 : 0.15;
+  const tri = (p, q, r, k) => { pos.push(...p, ...q, ...r); for (let i = 0; i < 3; i++) col.push(k.r, k.g, k.b); };
+  const cuad = (p, q, r, s, k) => { tri(p, q, r, k); tri(p, r, s, k); };
+  const tapa = (rings, yDe, k) => {  // polígono con huecos, cada vértice a su altura
+    const v2 = rings.map((r) => r.map(([x, z]) => new THREE.Vector2(x, z))); const todos = rings.flat();
+    let t; try { t = THREE.ShapeUtils.triangulateShape(v2[0], v2.slice(1)); } catch { return; }
+    for (const [i, j, l] of t) tri(...[i, j, l].map((n) => [todos[n][0], yDe(todos[n]), todos[n][1]]), k);
+  };
+  for (const h of HITOS.hitos) for (const [an, mn, top, techo, rh, color, colorT, dir] of h.partes) {
+    c.set(color || base).lerp(base, mezcla); ct.set(colorT || color || base).lerp(base, mezcla);
+    const rings = an.map((r) => { const o = []; for (let i = 0; i < r.length; i += 2) o.push([r[i], -r[i + 1]]); return o; });
+    const ext = rings[0]; let cx = 0, cz = 0; for (const [x, z] of ext) { cx += x; cz += z; } cx /= ext.length; cz /= ext.length;
+    let alto = () => top;
+    if (techo === 3) {  // a un agua: baja hacia donde mira roof:direction (grados desde el norte)
+      const dx = Math.sin(dir * Math.PI / 180), dz = -Math.cos(dir * Math.PI / 180); const pr = ext.map(([x, z]) => x * dx + z * dz);
+      const p0 = Math.min(...pr), p1 = Math.max(...pr); alto = ([x, z]) => top + rh * (1 - (x * dx + z * dz - p0) / ((p1 - p0) || 1));
+    }
+    for (const r of rings) for (let i = 0; i < r.length; i++) {
+      const a = r[i], b = r[(i + 1) % r.length];
+      cuad([a[0], mn, a[1]], [b[0], mn, b[1]], [b[0], alto(b), b[1]], [a[0], alto(a), a[1]], c);
+    }
+    if (mn > 0.3) tapa(rings, () => mn, c);  // piezas en el aire (anillos, cornisas): con piso
+    if (techo === 0 || techo === 3) tapa(rings, alto, ct);
+    else if (techo === 4 && ext.length === 4) {  // dos aguas: cumbrera a lo largo del lado más largo
+      const L = (i) => Math.hypot(ext[(i + 1) % 4][0] - ext[i][0], ext[(i + 1) % 4][1] - ext[i][1]);
+      const s = L(0) >= L(1) ? 1 : 0; const m = (i) => [(ext[i][0] + ext[(i + 1) % 4][0]) / 2, top + rh, (ext[i][1] + ext[(i + 1) % 4][1]) / 2];
+      const A = m(s), B = m(s + 2); const P = ext.map(([x, z]) => [x, top, z]);
+      cuad(P[(s + 1) % 4], P[(s + 2) % 4], B, A, ct); cuad(P[(s + 3) % 4], P[s], A, B, ct);
+      tri(P[s], P[(s + 1) % 4], A, c); tri(P[(s + 2) % 4], P[(s + 3) % 4], B, c);
+    } else if (techo === 2) {  // cúpula: anillos que se achican hacia el centro
+      const N = 7; let prev = ext.map(([x, z]) => [x, top, z]);
+      for (let k = 1; k <= N; k++) {
+        const a = k / N * Math.PI / 2, s = Math.cos(a), y = top + rh * Math.sin(a);
+        const cur = ext.map(([x, z]) => [cx + (x - cx) * s, y, cz + (z - cz) * s]);
+        for (let i = 0; i < ext.length; i++) { const j = (i + 1) % ext.length; cuad(prev[i], prev[j], cur[j], cur[i], ct); }
+        prev = cur;
+      }
+    } else {  // pirámide (y dos aguas sobre plantas raras)
+      const ap = [cx, top + rh, cz];
+      for (let i = 0; i < ext.length; i++) { const j = (i + 1) % ext.length; tri([ext[i][0], top, ext[i][1]], [ext[j][0], top, ext[j][1]], ap, ct); }
+    }
+  }
+  const g = new THREE.BufferGeometry();
+  g.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3)); g.setAttribute('color', new THREE.Float32BufferAttribute(col, 3));
+  g.computeVertexNormals(); g.computeBoundingSphere();
+  const m = new THREE.Mesh(g, MAT_HITO); m.castShadow = m.receiveShadow = true; capaHitos.add(m);
+  sombraSucia = true;
+}
+function armarCartelesHitos() {
+  for (const h of HITOS.hitos) {
+    const s = cartel(h.nombre); s.position.set(h.x, h.alto + 14, -h.y); s.userData.alto = h.alto; cartelesHitos.add(s);
+  }
+}
+
+// ---------- subte: líneas con su color y estaciones ----------
+let SUBTE = null;
+const capaSubte = new THREE.Group(); scene.add(capaSubte);
+const cartelesSubte = new THREE.Group(); scene.add(cartelesSubte);
+function pintarSubte() {
+  if (!SUBTE) return;
+  for (const o of [...capaSubte.children]) { o.geometry.dispose(); o.material.dispose(); capaSubte.remove(o); }
+  const disco = new THREE.CylinderGeometry(11, 11, 1, 20), centro_ = new THREE.CylinderGeometry(6.5, 6.5, 1.2, 20);
+  const blanco = new THREE.MeshBasicMaterial({ color: 0xffffff });
+  for (const { l, color, p } of SUBTE.lineas) {
+    const J = new Juntador(); const w = 3;
+    for (let i = 0; i + 3 < p.length; i += 2) {
+      const x0 = p[i], z0 = -p[i + 1], x1 = p[i + 2], z1 = -p[i + 3]; const L = Math.hypot(x1 - x0, z1 - z0) || 1;
+      const nx = -(z1 - z0) / L * w, nz = (x1 - x0) / L * w; const k = J.pos.length / 3;
+      J.pos.push(x0 - nx, 0.7, z0 - nz, x1 - nx, 0.7, z1 - nz, x1 + nx, 0.7, z1 + nz, x0 + nx, 0.7, z0 + nz);
+      for (let m = 0; m < 4; m++) J.nor.push(0, 1, 0);
+      J.idx.push(k, k + 2, k + 1, k, k + 3, k + 2);
+    }
+    const mat = new THREE.MeshBasicMaterial({ color, polygonOffset: true, polygonOffsetFactor: -4 });
+    capaSubte.add(J.malla(mat));
+    const est = SUBTE.estaciones; const idx = []; for (let i = 0; i < est.length; i += 4) if (est[i + 2] === l) idx.push(i);
+    const d = new THREE.InstancedMesh(disco, mat.clone(), idx.length), cB = new THREE.InstancedMesh(centro_, blanco, idx.length);
+    const m = new THREE.Matrix4(); idx.forEach((i, k) => { m.makeTranslation(est[i], 1, -est[i + 1]); d.setMatrixAt(k, m); cB.setMatrixAt(k, m); });
+    capaSubte.add(d, cB);
+  }
+}
+function armarCartelesSubte() {
+  const est = SUBTE.estaciones;
+  for (let i = 0; i < est.length; i += 4) { const s = cartel(`${est[i + 2]} · ${est[i + 3]}`); s.position.set(est[i], 10, -est[i + 1]); cartelesSubte.add(s); }
+}
+function carteles2() {  // edificios conocidos y estaciones: los más cercanos a lo que se mira
+  const t = controls.target, d = camera.position.distanceTo(t);
+  for (const s of cartelesHitos.children) s.visible = AJ.hitos && AJ.nhitos && d < 3500 && s.position.distanceTo(t) < Math.max(900, d * 1.4);
+  const cerca = [];
+  for (const s of cartelesSubte.children) { s.visible = false; if (AJ.subte && AJ.nsubte && d < 2600) { const ds = s.position.distanceTo(t); if (ds < Math.min(1500, d * 1.2)) cerca.push([ds, s]); } }
+  cerca.sort((a, b) => a[0] - b[0]); for (const [, s] of cerca.slice(0, 14)) s.visible = true;
+}
+
+// ---------- sol: dónde está en Buenos Aires según el día y la hora, y sombras que siguen a la cámara ----------
+renderer.shadowMap.enabled = true; renderer.shadowMap.type = THREE.PCFSoftShadowMap; renderer.shadowMap.autoUpdate = false;
+sol.shadow.mapSize.set(4096, 4096); sol.shadow.bias = -0.0004; sol.shadow.normalBias = 0.6; scene.add(sol.target);
+let sombraSucia = true;
+const arbolesMallas = new Set();
+const SOL_FIJO = new THREE.Vector3(700, 900, -700).normalize();
+function posSol(fecha) {  // fórmula de posición solar (aprox. del almanaque, error < 1°) para Buenos Aires
+  const rad = Math.PI / 180, lat = -34.6 * rad, lon = -58.44;
+  const d = fecha.getTime() / 86400000 - 10957.5;  // días desde el 1/1/2000 a las 12 UTC
+  const g = (357.529 + 0.98560028 * d) * rad, q = 280.459 + 0.98564736 * d;
+  const L = (q + 1.915 * Math.sin(g) + 0.020 * Math.sin(2 * g)) * rad, e = (23.439 - 0.00000036 * d) * rad;
+  const ra = Math.atan2(Math.cos(e) * Math.sin(L), Math.cos(L)), dec = Math.asin(Math.sin(e) * Math.sin(L));
+  const H = ((18.697374558 + 24.06570982441908 * d) % 24 * 15 + lon) * rad - ra;
+  const alto = Math.asin(Math.sin(lat) * Math.sin(dec) + Math.cos(lat) * Math.cos(dec) * Math.cos(H));
+  const az = Math.atan2(-Math.sin(H), Math.tan(dec) * Math.cos(lat) - Math.sin(lat) * Math.cos(H));  // desde el norte, hacia el este
+  return { alto, az };
+}
+const hoy = new Date(Date.now() - 3 * 3600000);  // hora de Buenos Aires (UTC−3)
+$('i-fecha').value = hoy.toISOString().slice(0, 10);
+$('i-hora').value = String(Math.min(21, Math.max(5, Math.round((hoy.getUTCHours() + hoy.getUTCMinutes() / 60) * 4) / 4)));
+let dirSol = SOL_FIJO.clone();
+function ponerSol() {
+  const [y, mo, dd] = ($('i-fecha').value || hoy.toISOString().slice(0, 10)).split('-').map(Number); const h = +$('i-hora').value;
+  const { alto, az } = posSol(new Date(Date.UTC(y, mo - 1, dd, 3) + h * 3600000));
+  const hh = Math.floor(h), mm = Math.round((h - hh) * 60);
+  $('t-sol').textContent = `${String(hh).padStart(2, '0')}:${String(mm).padStart(2, '0')} · ` + (alto > 0 ? `sol a ${Math.round(alto * 180 / Math.PI)}°` : 'de noche');
+  if (AJ.sombras) {
+    dirSol.set(Math.sin(az) * Math.cos(alto), Math.sin(alto), -Math.cos(az) * Math.cos(alto));
+    sol.intensity = 1.6 * THREE.MathUtils.smoothstep(Math.sin(alto), -0.02, 0.12);
+  } else { dirSol.copy(SOL_FIJO); sol.intensity = 1.5; }
+  sol.castShadow = AJ.sombras && sol.intensity > 0; sombraSucia = true;
+}
+function seguirSol() {  // la caja de sombras se centra en lo que se mira y crece con la distancia
+  const t = controls.target, d = camera.position.distanceTo(t); const r = Math.min(3000, Math.max(150, d * 0.9));
+  sol.target.position.copy(t); sol.position.copy(t).addScaledVector(dirSol, r * 3);
+  if (!sol.castShadow) return;
+  const cam = sol.shadow.camera;
+  if (cam.right !== r) { Object.assign(cam, { left: -r, right: r, top: r, bottom: -r, near: r * 0.5, far: r * 6 }); cam.updateProjectionMatrix(); }
+  if (sombraSucia) { renderer.shadowMap.needsUpdate = true; sombraSucia = false; }
+}
+$('i-hora').addEventListener('input', ponerSol); $('i-fecha').addEventListener('change', ponerSol);
+$('b-ahora').onclick = () => {
+  const a = new Date(Date.now() - 3 * 3600000); $('i-fecha').value = a.toISOString().slice(0, 10);
+  $('i-hora').value = String(Math.min(21, Math.max(5, Math.round((a.getUTCHours() + a.getUTCMinutes() / 60) * 4) / 4))); ponerSol();
+};
+controls.addEventListener('change', () => { sombraSucia = true; });
+
 function distBarrio(b, x, z) {
   const [x0, y0, x1, y1] = b.bbox; const dx = Math.max(x0 - x, 0, x - x1), dz = Math.max(-y1 - z, 0, z + y0);
   return Math.hypot(dx, dz);
@@ -644,8 +876,10 @@ function candidatas(texto) {
 }
 const enBarrio = (bi) => (bi >= 0 && BARRIOS[bi] ? ' · ' + BARRIOS[bi].nombre : '');
 function buscar(texto) {
-  if (!CALLES) return { error: 'Las calles todavía se están cargando.' };
   const t = texto.trim();
+  const hito = t.length > 3 && HITOS?.hitos.find((h) => llano(h.nombre).includes(llano(t)));  // "obelisco", "barolo"…
+  if (hito) return { x: hito.x, z: -hito.y, txt: hito.nombre + (hito.aprox ? ' · forma aproximada' : ''), hito };
+  if (!CALLES) return { error: 'Las calles todavía se están cargando.' };
   const esquina = t.split(/\s+(?:y|e|esq\.?|esquina)\s+|\s*&\s*/i);
   if (esquina.length === 2) {
     const ca = candidatas(esquina[0]).slice(0, 6), cb = candidatas(esquina[1]).slice(0, 6);
@@ -691,7 +925,9 @@ function volarA(x, z, desde = new THREE.Vector3(-140, 190, 230), alto = 0) {
 $('f-buscar').addEventListener('submit', (ev) => {
   ev.preventDefault(); const r = buscar($('q').value);
   if (r.error) { $('r-buscar').textContent = r.error; return; }
-  pin.position.set(r.x, 0, r.z); pin.visible = true; $('r-buscar').textContent = r.txt; volarA(r.x, r.z);
+  $('r-buscar').textContent = r.txt;
+  if (r.hito) { pin.visible = false; const k = Math.max(1, r.hito.alto / 45); volarA(r.x, r.z, new THREE.Vector3(-110 * k, 80 * k, 150 * k), r.hito.alto * 0.35); return; }
+  pin.position.set(r.x, 0, r.z); pin.visible = true; volarA(r.x, r.z);
 });
 $('q').addEventListener('input', () => { if (!$('q').value) { $('r-buscar').textContent = ''; pin.visible = false; } });
 
@@ -872,8 +1108,12 @@ addEventListener('keydown', () => { if (intro.activo) terminarIntro(); });
 aplicarAspecto();
 (async () => {
   try {
-    const [rb, rc] = await Promise.all([fetch('datos/barrios.json'), fetch('datos/calles.json')]);
+    const opcional = (f) => fetch(f).then((r) => (r.ok ? r.json() : null)).catch(() => null);
+    const [rb, rc, hi, su] = await Promise.all([fetch('datos/barrios.json'), fetch('datos/calles.json'), opcional('datos/hitos.json'), opcional('datos/subte.json')]);
     if (!rb.ok || !rc.ok) throw new Error('faltan archivos de la maqueta');
+    // los edificios conocidos llegan antes que los barrios: así cada barrio ya sabe qué volúmenes de Tejido sacar
+    if (hi) { HITOS = hi; prepararHuellas(); pintarHitos(); armarCartelesHitos(); }
+    if (su) { SUBTE = su; pintarSubte(); armarCartelesSubte(); }
     BARRIOS = (await rb.json()).barrios; CALLES = await rc.json();
     CALLES.llanos = CALLES.nombres.map(llano); CALLES.porCalle = new Map();
     CALLES.largoCalle = new Float32Array(CALLES.nombres.length);
@@ -881,7 +1121,7 @@ aplicarAspecto();
       if (!CALLES.porCalle.has(t[0])) CALLES.porCalle.set(t[0], []);
       CALLES.porCalle.get(t[0]).push(t); CALLES.largoCalle[t[0]] += largo(t[3]);
     }
-    $('l-calles').innerHTML = [...CALLES.nombres].sort((a, b) => a.localeCompare(b, 'es')).map((n) => `<option value="${lindo(n)}">`).join('');
+    $('l-calles').innerHTML = (HITOS?.hitos || []).map((h) => `<option value="${h.nombre}">`).join('') + [...CALLES.nombres].sort((a, b) => a.localeCompare(b, 'es')).map((n) => `<option value="${lindo(n)}">`).join('');
     // cada barrio con su propio suelo y su borde, para poder iluminarlo y elegirlo
     let x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity;
     BARRIOS.forEach((b, i) => {
@@ -893,7 +1133,7 @@ aplicarAspecto();
       }
       b.matSuelo = new THREE.MeshLambertMaterial({ color: css('--calle'), side: THREE.DoubleSide });
       b.matHolo = new THREE.MeshBasicMaterial({ color: 0x36e6ff, transparent: true, opacity: 0, blending: THREE.AdditiveBlending, depthWrite: false, side: THREE.DoubleSide });
-      b.relleno = suelo.malla(b.matSuelo); b.relleno.userData.barrio = i; scene.add(b.relleno);
+      b.relleno = suelo.malla(b.matSuelo); b.relleno.userData.barrio = i; b.relleno.receiveShadow = true; scene.add(b.relleno);
       const gb = new THREE.BufferGeometry(); gb.setAttribute('position', new THREE.Float32BufferAttribute(lineas, 3));
       b.borde = new THREE.LineSegments(gb, new THREE.LineBasicMaterial({ color: css('--borde'), transparent: true, opacity: 0.55 })); scene.add(b.borde);
       b.cartel = cartel(b.nombre, true); b.cartel.position.set((b.bbox[0] + b.bbox[2]) / 2, 30, -(b.bbox[1] + b.bbox[3]) / 2);
@@ -924,9 +1164,9 @@ renderer.setAnimationLoop(() => {
       fijarHover(l ? -1 : barrioBajo()); if (l) canvas.style.cursor = 'pointer';
     }
     if (hover >= 0) brillo(ahora);
-    actualizarCarteles();
+    actualizarCarteles(); carteles2();
   }
-  controls.update(); renderer.render(scene, camera);
+  controls.update(); seguirSol(); renderer.render(scene, camera);
 });
 </script>
 
